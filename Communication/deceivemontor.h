@@ -8,7 +8,7 @@ class deceiveMontor : public QObject
 {
     Q_OBJECT
 public:
-    explicit deceiveMontor(QObject *parent = 0, mySerialPort serial);
+    explicit deceiveMontor(QObject *parent = 0, mySerialPort *serial = 0);
 
 private:
     mySerialPort *serialPort;
