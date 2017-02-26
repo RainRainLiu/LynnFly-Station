@@ -4,3 +4,5 @@ deceiveMontor::deceiveMontor(QObject *parent, mySerialPort *serial) : QObject(pa
 {
     serialPort = serial;
 }
+
+

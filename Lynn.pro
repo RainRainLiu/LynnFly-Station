@@ -16,10 +16,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     Componemts/myserialport.cpp \
-    Communication/deceivemontor.cpp
+    Communication/deceivemontor.cpp \
+    Communication/format.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
-    Communication/deceivemontor.h
+    Communication/deceivemontor.h \
+    Communication/format.h
 
 FORMS    += mainwindow.ui
