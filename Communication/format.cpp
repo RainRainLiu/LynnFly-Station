@@ -1,121 +1,190 @@
 #include "format.h"
+const uint8_t   STX = 0xeb;
+const uint8_t   ETX = 0x30;
+const uint8_t   ESC = 0xef;
 
-format::format(QObject *parent) : QObject(parent)
+format::format(QObject *parent, SendFun *fun) : QObject(parent)
 {
-
+    sendFun = fun;
 }
-/******************************************
- * @函数说明：选择端口的信号槽
- * @输入参数：QAction * action 读取action->text
- *          作为端口号的名称
- * @返回参数：无
- * @修订日期：
-******************************************/
-void format::PacketParsing(uint8_t data)
+/******************************************************************
+  * @ Name          : void ReceiveError(DataPack_typdef *data_pack)
+  * @ Description   : receive error, reset step, save error number
+  * @ Input         : DataPack_typdef *data_pack
+  * @ Output        : None
+  * @ Return        : None
+  * @ Modify the record : ---
+******************************************************************/
+void format::ReceiveError()
 {
+    ErrorNumber = step;
+    step = 0;
+}
+
+/************************
+ * 转义处理
+************************/
+static uint16_t DisposeESC(uint32_t nLength, uint8_t *pOut, const uint8_t *pIn)
+{
+    uint32_t i = 0;
+    uint16_t temp;
+    uint16_t out_length = 0;
+    for (i = 0; i < nLength; i++)
+    {
+        if (*pIn == STX || *pIn  == ETX || *pIn  == ESC)  //need to  escape data processing
+        {
+            temp = *pIn | 0x100;
+            *pOut = ESC;
+            out_length++;
+            pOut++;
+            *pOut = (uint8_t)((temp - ESC) & 0XFF);
+        }
+        else
+        {
+            *pOut = *pIn;
+
+        }
+        out_length++;
+        pOut++;
+        pIn++;
+    }
+    return out_length;
+}
+
+/******************************************************************
+  * @ Name          : void PacketParsing(DataPack_typdef *data_pack, uint8_t data)
+  * @ Description   : Packet parsing
+  * @ Input         : DataPack_typdef *data_pack
+  * @ Output        : None
+  * @ Return        : None
+  * @ Modify the record : ---
+******************************************************************/
+void format::Parsing(uint8_t inData)
+{
+    uint8_t data;
+
+    if(inData == STX)     // find STX
+    {
+        data = inData;
+        ReceiveError();
+    }
+    else if(inData == ESC && lastData != ESC)
+    {
+        lastData = inData;
+        return;
+    }
+    else if(lastData == ESC)
+    {
+        data = (uint8_t)((inData + ESC) & 0xFF);
+        lastData= 0;
+    }
+
     switch(step)
     {
         case 0:
         {
-            if (data == 0xeb)                    //header check
+            if (data == STX)                    //header check
             {
                 step++;
             }
         }
         break;
+
         case 1:
         {
-            if (data == 0x90)                    //header check
-            {
-                step++;
-            }
-            else
-            {
-                ReceiveError();
-            }
+            packet.nCMD = data;
+            step++;
+            count = 0;
         }
         break;
 
         case 2:
         {
-            CMD = data;              //save cmd
-            step++;
+            if (count == 0)
+            {
+                packet.nLength = data;
+                count++;
+            }
+            else
+            {
+                packet.nLength |= (data >> 8);
+                step++;
+                count = 0;
+            }
         }
         break;
 
         case 3:
         {
-            if (data == 0)
-            {
-                step = 0x21;         //no data
+            packet.aData[count] = data;
 
-            }
-            else
+            count++;
+            if (count >= packet.nLength)       //data receive carry out
             {
-                step = 0x20;         // receive data
-                length = data;
+                step++;
             }
-            check_sum = 0;
-            count = 0;
         }
         break;
 
-        case 0x20:
-            Data[count] = data;
-            check_sum += data;
-            count++;
-            if (count >= length)       //data receive carry out
+        case 4:
+        {
+            if (checkSum == data)
             {
-                step = 0x21;
-            }
-            break;
-
-        case 0x21:
-            if ((check_sum & 0xFF) == data)           //check sum hight bit
-            {
-                step = 0x22;
+                step++;
             }
             else
             {
                 ReceiveError();
             }
-            break;
+        }
+        break;
 
-
-        case 0x22:
-            if( (check_sum >> 8) == data)       //check sum low bit
+        case 5:
+        {
+            if (data == ETX)
             {
-                step = 0xff;
+                emit packetComplete(packet);
             }
-            else
-            {
-                ReceiveError();
-            }
-            break;
-
-
-        case 0xff:
-            if (data == 0x03)                                // tail check
-            {
-                step = 0;
-            }
-            else
-            {
-                ReceiveError();
-            }
-            break;
+        }
+        break;
     }
 }
 
-/******************************************
- * @函数说明：选择端口的信号槽
- * @输入参数：QAction * action 读取action->text
- *          作为端口号的名称
- * @返回参数：无
- * @修订日期：
-******************************************/
-void format::ReceiveError()
+/******************************************************************
+  * @ Name          : void ReceiveError(DataPack_typdef *pParsing)
+  * @ Description   : receive error, reset step, save error number
+  * @ Input         : DataPack_typdef *pParsing
+  * @ Output        : None
+  * @ Return        : None
+  * @ Modify the record : ---
+*****************************************************************/
+void format::BuildAndSendPack(struct DataPacket *pPack)
 {
-    step = 0;
-    ErrorNumber = step;
+    uint8_t escBuf[(PACKET_DATA_LENGTH + 6) * 2];
+    uint32_t length = 0;
+    uint8_t checkSum = 0;
+    uint32_t i;
+
+    escBuf[length++] = STX;
+    length += DisposeESC(1, &escBuf[length], &pPack->nCMD);
+    length += DisposeESC(2, &escBuf[length], (uint8_t *)&pPack->nLength);
+    length += DisposeESC(pPack->nLength, &escBuf[length], (uint8_t *)&pPack->aData);
+
+    checkSum = STX + pPack->nCMD;
+    checkSum += (uint8_t)(pPack->nLength & 0xff) + (uint8_t)((pPack->nLength >> 8) & 0xff);
+
+    for (i = 0; i < pPack->nLength;i++)   //计算校验码
+    {
+        checkSum += pPack->aData[i];
+    }
+
+    escBuf[length++] = checkSum;
+    escBuf[length++] = ETX;
+
+    if (sendFun != NULL)
+    {
+        sendFun(escBuf, length);
+    }
 }
+
+
