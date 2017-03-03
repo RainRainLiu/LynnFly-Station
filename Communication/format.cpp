@@ -59,7 +59,7 @@ static uint16_t DisposeESC(uint32_t nLength, uint8_t *pOut, const uint8_t *pIn)
   * @ Return        : None
   * @ Modify the record : ---
 ******************************************************************/
-void format::Parsing(uint8_t inData)
+DataPacket* format::Parsing(uint8_t inData)
 {
     uint8_t data;
 
@@ -71,7 +71,7 @@ void format::Parsing(uint8_t inData)
     else if(inData == ESC && lastData != ESC)
     {
         lastData = inData;
-        return;
+        return NULL;
     }
     else if(lastData == ESC)
     {
@@ -143,11 +143,13 @@ void format::Parsing(uint8_t inData)
         {
             if (data == ETX)
             {
-                emit packetComplete(packet);
+                return &packet;
+                //emit packetComplete(packet);
             }
         }
         break;
     }
+    return NULL;
 }
 
 /******************************************************************
@@ -158,7 +160,7 @@ void format::Parsing(uint8_t inData)
   * @ Return        : None
   * @ Modify the record : ---
 *****************************************************************/
-void format::BuildAndSendPack(struct DataPacket *pPack)
+void format::BuildAndSendPack(DataPacket *pPack)
 {
     uint8_t escBuf[(PACKET_DATA_LENGTH + 6) * 2];
     uint32_t length = 0;
