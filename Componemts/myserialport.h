@@ -30,6 +30,8 @@ signals:
     void receiceData(QByteArray buf);
 
 public slots:
+    int writeData(QByteArray array);
+
 };
 
 #endif // MYSERIALPORT_H

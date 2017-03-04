@@ -149,6 +149,16 @@ void mySerialPort::readData(void)
     buf.clear();
 }
 /******************************************
+ * @函数说明：
+ * @输入参数：
+ * @返回参数：
+ * @修订日期：
+******************************************/
+int mySerialPort::writeData(QByteArray array)
+{
+    return serialPort->write(array);
+}
+/******************************************
  * @函数说明：使用默认配置打开串口
  * @输入参数：QString portName 端口名称
  * @返回参数：bool 结果

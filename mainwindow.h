@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "Componemts/myserialport.h"
 #include "QLabel"
+#include "Communication/deceivemontor.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,8 +24,8 @@ private:
     Ui::MainWindow *ui;
     void CreatMenu();
 
-    mySerialPort *serialPort;
     QLabel *statueLable;
+    deceiveMontor *devMintor;
 };
 
 #endif // MAINWINDOW_H

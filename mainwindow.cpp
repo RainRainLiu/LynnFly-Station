@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CreatMenu();
     statueLable = new QLabel("未选择端口");
     ui->statusBar->addWidget(statueLable);
+    devMintor = new deceiveMontor();
 }
 
 MainWindow::~MainWindow()
@@ -27,8 +28,6 @@ MainWindow::~MainWindow()
 ******************************************/
 void MainWindow::CreatMenu()
 {
-    serialPort = new mySerialPort();
-
     QMenu *menu = ui->menuBar->addMenu(tr("COM"));
 
     foreach (const QSerialPortInfo &Info, QSerialPortInfo::availablePorts())
@@ -49,8 +48,7 @@ void MainWindow::CreatMenu()
 ******************************************/
 void MainWindow::OpenCom(QAction * action)
 {
-    serialPort->closePort();
-    if (serialPort->openPortForDef(action->text()) == true)
+    if (devMintor->montorSerialPort(action->text()) == true)
     {
         statueLable->setText("正在监听： " + action->text());
     }

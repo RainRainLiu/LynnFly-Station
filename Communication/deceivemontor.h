@@ -1,19 +1,24 @@
 #ifndef DECEIVEMONTOR_H
 #define DECEIVEMONTOR_H
 
-#include <QObject>
+#include <QThread>
 #include "Componemts/myserialport.h"
 
-class deceiveMontor : public QObject
+class deceiveMontor : public QThread
 {
     Q_OBJECT
 public:
-    explicit deceiveMontor(QObject *parent = 0, mySerialPort *serial = 0);
+    explicit deceiveMontor();
+    void run();
+    bool montorSerialPort(QString name);
+    void stopMontor();
 
 private:
     mySerialPort *serialPort;
+    bool runFlag;
 
 signals:
+    int writeData(QByteArray array);
 
 public slots:
 };

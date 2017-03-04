@@ -3,9 +3,8 @@ const uint8_t   STX = 0xeb;
 const uint8_t   ETX = 0x30;
 const uint8_t   ESC = 0xef;
 
-format::format(QObject *parent, SendFun *fun) : QObject(parent)
+format::format(QObject *parent) : QObject(parent)
 {
-    sendFun = fun;
 }
 /******************************************************************
   * @ Name          : void ReceiveError(DataPack_typdef *data_pack)
@@ -78,6 +77,10 @@ DataPacket* format::Parsing(uint8_t inData)
         data = (uint8_t)((inData + ESC) & 0xFF);
         lastData= 0;
     }
+    else
+    {
+        data = inData;
+    }
 
     switch(step)
     {
@@ -110,6 +113,10 @@ DataPacket* format::Parsing(uint8_t inData)
                 packet.nLength |= (data >> 8);
                 step++;
                 count = 0;
+                if (packet.nLength == 0)
+                {
+                    step++;
+                }
             }
         }
         break;
@@ -160,9 +167,15 @@ DataPacket* format::Parsing(uint8_t inData)
   * @ Return        : None
   * @ Modify the record : ---
 *****************************************************************/
-void format::BuildAndSendPack(DataPacket *pPack)
+QByteArray format::BuildAndSendPack(DataPacket *pPack)
 {
-    uint8_t escBuf[(PACKET_DATA_LENGTH + 6) * 2];
+    if (pPack->nLength > PACKET_DATA_LENGTH)
+    {
+        return NULL;
+    }
+
+    QByteArray array;
+    uint8_t *escBuf = (uint8_t *)malloc((PACKET_DATA_LENGTH + 6) * 2);//[(PACKET_DATA_LENGTH + 6) * 2];
     uint32_t length = 0;
     uint8_t checkSum = 0;
     uint32_t i;
@@ -183,10 +196,9 @@ void format::BuildAndSendPack(DataPacket *pPack)
     escBuf[length++] = checkSum;
     escBuf[length++] = ETX;
 
-    if (sendFun != NULL)
-    {
-        sendFun(escBuf, length);
-    }
+    array.append((const char*)escBuf, (int)length);
+
+    return array;
 }
 
 

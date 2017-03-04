@@ -9,7 +9,7 @@
 typedef struct
 {
     uint8_t nCMD;
-    uint8_t nLength;
+    uint16_t nLength;
     uint8_t aData[PACKET_DATA_LENGTH];
 }DataPacket;
 
@@ -18,11 +18,9 @@ class format : public QObject
     Q_OBJECT
 public:
 
-    typedef void *(SendFun)(uint8_t *buff, uint32_t nLength);
-
-    explicit format(QObject *parent = 0, SendFun *fun = NULL);
+    explicit format(QObject *parent = 0);
     DataPacket* Parsing(uint8_t inData);   //解析
-    void BuildAndSendPack(DataPacket *pPack);
+    QByteArray BuildAndSendPack(DataPacket *pPack);
 
     uint8_t ErrorNumber;
 
@@ -34,7 +32,6 @@ private:
     uint32_t count;
     uint8_t checkSum;
     DataPacket packet;
-    SendFun *sendFun;
 
 signals:
     //void packetComplete(struct DataPacket packet);
