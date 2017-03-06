@@ -20,7 +20,7 @@ public:
 
     explicit format(QObject *parent = 0);
     DataPacket* Parsing(uint8_t inData);   //解析
-    QByteArray BuildAndSendPack(DataPacket *pPack);
+    QByteArray BuildPack(DataPacket *pPack);
 
     uint8_t ErrorNumber;
 
@@ -30,7 +30,6 @@ private:
     uint8_t  step;
     uint8_t lastData;
     uint32_t count;
-    uint8_t checkSum;
     DataPacket packet;
 
 signals:

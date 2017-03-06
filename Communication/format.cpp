@@ -20,6 +20,23 @@ void format::ReceiveError()
     step = 0;
 }
 
+uint8_t CalculateCheckSum(DataPacket *pPack)
+{
+    uint8_t checkSum = STX;
+
+    checkSum += pPack->nCMD;
+    checkSum += (uint8_t)(pPack->nLength & 0xff);
+    checkSum += (uint8_t)((pPack->nLength >> 8) & 0xff);
+
+    uint32_t i;
+
+    for (i = 0; i < pPack->nLength; i ++)
+    {
+        checkSum += pPack->aData[i];
+    }
+
+    return checkSum;
+}
 /************************
  * 转义处理
 ************************/
@@ -135,7 +152,7 @@ DataPacket* format::Parsing(uint8_t inData)
 
         case 4:
         {
-            if (checkSum == data)
+            if (CalculateCheckSum(&packet) == data)
             {
                 step++;
             }
@@ -151,7 +168,6 @@ DataPacket* format::Parsing(uint8_t inData)
             if (data == ETX)
             {
                 return &packet;
-                //emit packetComplete(packet);
             }
         }
         break;
@@ -167,7 +183,7 @@ DataPacket* format::Parsing(uint8_t inData)
   * @ Return        : None
   * @ Modify the record : ---
 *****************************************************************/
-QByteArray format::BuildAndSendPack(DataPacket *pPack)
+QByteArray format::BuildPack(DataPacket *pPack)
 {
     if (pPack->nLength > PACKET_DATA_LENGTH)
     {
@@ -177,23 +193,15 @@ QByteArray format::BuildAndSendPack(DataPacket *pPack)
     QByteArray array;
     uint8_t *escBuf = (uint8_t *)malloc((PACKET_DATA_LENGTH + 6) * 2);//[(PACKET_DATA_LENGTH + 6) * 2];
     uint32_t length = 0;
-    uint8_t checkSum = 0;
-    uint32_t i;
+
 
     escBuf[length++] = STX;
     length += DisposeESC(1, &escBuf[length], &pPack->nCMD);
     length += DisposeESC(2, &escBuf[length], (uint8_t *)&pPack->nLength);
     length += DisposeESC(pPack->nLength, &escBuf[length], (uint8_t *)&pPack->aData);
 
-    checkSum = STX + pPack->nCMD;
-    checkSum += (uint8_t)(pPack->nLength & 0xff) + (uint8_t)((pPack->nLength >> 8) & 0xff);
 
-    for (i = 0; i < pPack->nLength;i++)   //计算校验码
-    {
-        checkSum += pPack->aData[i];
-    }
-
-    escBuf[length++] = checkSum;
+    escBuf[length++] = CalculateCheckSum(pPack);
     escBuf[length++] = ETX;
 
     array.append((const char*)escBuf, (int)length);

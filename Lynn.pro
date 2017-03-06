@@ -17,11 +17,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     Componemts/myserialport.cpp \
     Communication/deceivemontor.cpp \
-    Communication/format.cpp
+    Communication/format.cpp \
+    Communication/drive.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
     Communication/deceivemontor.h \
-    Communication/format.h
+    Communication/format.h \
+    Communication/drive.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    ico.qrc
