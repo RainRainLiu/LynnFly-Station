@@ -17,17 +17,20 @@ private:
     format *comFormat;
     DataPacket latestPacket;
     uint8_t retryCount;
+    bool connected;
 
-
-    void sendPack(DataPacket packet);
     void sendPackAndStartRetry(DataPacket packet);
 
 signals:
-    int writeData(QByteArray array);
+    int writeData(QByteArray array);    //写入数据
+    void deviceConnect();   //设备连接
+    void deviceDisconnect();    //设备断开连接
+    void writeError();
 
 private slots:
-    void retryTimeOut();
+    void retryTimeOut();    //
     void sendHearbeat();
+
 
 public slots:
     void receivePacketProcess(DataPacket packet);
