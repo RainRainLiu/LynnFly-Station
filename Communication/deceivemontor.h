@@ -4,6 +4,7 @@
 #include <QThread>
 #include "Componemts/myserialport.h"
 #include "format.h"
+#include "drive.h"
 
 class deceiveMontor : public QThread
 {
@@ -19,7 +20,9 @@ public:
 private:
     format *comFormat;
     mySerialPort *serialPort;
+    drive *comDrive;
     bool runFlag;
+
 
 
 signals:
