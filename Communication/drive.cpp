@@ -48,7 +48,7 @@ void drive::sendHearbeat()
 
     DataPacket packet;
 
-    packet.nCMD = CMD_HEARBEAT;
+    packet.nCMD = COM_CMD_HEARBEAT;
     packet.nLength = 0;
 
     sendPackAndStartRetry(packet);
@@ -179,6 +179,15 @@ void drive::receiveProcess(QByteArray buf)
         }
     }
 }
+
+/******************************************
+ * @函数说明：发送数据包，并启动重发
+ * @输入参数：DataPacket packet 数据包
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void drive::sendFileInfo()
+
 
 
 
