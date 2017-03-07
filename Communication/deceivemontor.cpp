@@ -41,7 +41,7 @@ bool deceiveMontor::montorSerialPort(QString name)
     if (result == true)
     {
         runFlag = true;
-        comDrive->startHearbeat();
+        start();
     }
     return result;
 }

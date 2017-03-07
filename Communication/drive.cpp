@@ -1,7 +1,7 @@
 #include "drive.h"
 #include "format.h"
 
-#define HERARBEAT_TIME_OUT_TIME     500
+#define HERARBEAT_TIME_OUT_TIME     1000
 #define RETRY_TIME_OUT_TIME         500
 
 #define CMD_HEARBEAT    0X01
@@ -57,17 +57,28 @@ void drive::sendPackAndStartRetry(DataPacket packet)
 {
     latestPacket = packet;
     retryCount = 0;
+    sendPack(packet);
+}
+/******************************************
+ * @函数说明：发送数据包，并启动重发
+ * @输入参数：DataPacket packet 数据包
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void drive::sendPack(DataPacket packet)
+{
+    latestPacket = packet;
+    int length =  emit writeData(comFormat->BuildPack(&packet));
 
-    if ((emit writeData(comFormat->BuildPack(&packet))) > 0)
+    if (length > 0)
     {
+        if (retryTimer->isActive() == true)
+        {
+            retryTimer->stop();
+        }
         retryTimer->start(RETRY_TIME_OUT_TIME); //启动重发定时器
     }
-    else
-    {
-        emit writeError();
-    }
 }
-
 /******************************************
  * @函数说明：发送数据包，并启动重发
  * @输入参数：DataPacket packet 数据包
@@ -77,25 +88,10 @@ void drive::sendPackAndStartRetry(DataPacket packet)
 void drive::retryTimeOut()
 {
     retryCount++;
+    sendPack(latestPacket);
     if (retryCount > 3)
     {
-        if (retryTimer->isActive() == true) //停止心跳
-        {
-            retryTimer->stop();
-        }
-        emit deviceDisconnect(); //设备断开连接
-        connected = false;
-    }
-    else
-    {
-        if ((emit writeData(comFormat->BuildPack(&latestPacket))) > 0)
-        {
-            retryTimer->start(RETRY_TIME_OUT_TIME); //启动重发定时器
-        }
-        else
-        {
-            emit writeError();
-        }
+
     }
 }
 
@@ -111,16 +107,10 @@ void drive::receivePacketProcess(DataPacket packet)
     {
         case CMD_HEARBEAT:
         {
-            if (connected == false)
-            {
-                connected = true;
-                emit deviceConnect();
-            }
             startHearbeat();
         }
         break;
     }
-    retryTimer->stop();
 }
 
 
