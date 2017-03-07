@@ -10,6 +10,7 @@ class drive : public QObject
 public:
     explicit drive(QObject *parent = 0);
     void startHearbeat();
+    void receiveProcess(QByteArray buf);
 
 private:
     QTimer *hearbeatTimer;
@@ -20,6 +21,7 @@ private:
     bool connected;
 
     void sendPackAndStartRetry(DataPacket packet);
+    void receivePacketProcess(DataPacket *packet);
 
 signals:
     int writeData(QByteArray array);    //写入数据
@@ -30,10 +32,6 @@ signals:
 private slots:
     void retryTimeOut();    //
     void sendHearbeat();
-
-
-public slots:
-    void receivePacketProcess(DataPacket packet);
 
 };
 

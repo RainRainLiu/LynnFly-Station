@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     statueLable = new QLabel("未选择端口");
     ui->statusBar->addWidget(statueLable);
     devMintor = new deceiveMontor();
+    connect(devMintor, SIGNAL(updateDeviceInfo(QString)), this, SLOT(deviceInfo(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -136,4 +137,15 @@ void MainWindow::progDlogCandeled()
 {
     disconnect(devMintor,SIGNAL(updateFirmwareProgress(QString,uint32_t,bool)),
                this, SLOT(progDlogUpdate(QString,uint32_t,bool)));
+}
+
+/******************************************
+ * @函数说明：更新固件的动作的槽
+ * @输入参数：
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void MainWindow::deviceInfo(QString str)
+{
+    statueLable->setText(str);
 }

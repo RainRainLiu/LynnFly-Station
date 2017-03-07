@@ -28,9 +28,16 @@ private:
 signals:
     int writeData(QByteArray array);
     void updateFirmwareProgress(QString str, uint32_t progress, bool end);
+    void updateDeviceInfo(QString str);
 
 public slots:
     void receiveProcess(QByteArray buf);
+
+
+private slots:
+    void deviceConnect();
+    void deviceDisconnect();
+    void writeError();
 };
 
 #endif // DECEIVEMONTOR_H

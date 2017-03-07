@@ -22,6 +22,7 @@ private slots:
     void updateFirmware(bool b);
     void progDlogCandeled();
     void progDlogUpdate(QString title, uint32_t progress, bool end);
+    void deviceInfo(QString str);
 
 private:
     Ui::MainWindow *ui;

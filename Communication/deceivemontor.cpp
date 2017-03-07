@@ -6,8 +6,12 @@ deceiveMontor::deceiveMontor() : QThread()
 {
     comFormat = new format();
     serialPort = new mySerialPort();
-    connect(this, SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
+    comDrive = new drive();
+    connect(comDrive, SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
     connect(serialPort, SIGNAL(receiceData(QByteArray)), this, SLOT(receiveProcess(QByteArray)));
+    connect(comDrive, SIGNAL(deviceConnect()), this, SLOT(deviceConnect()));
+    connect(comDrive, SIGNAL(deviceDisconnect()), this, SLOT(deviceDisconnect()));
+    connect(comDrive, SIGNAL(writeError()), this, SLOT(writeError()));
 }
 
 /******************************************
@@ -65,15 +69,8 @@ void deceiveMontor::stopMontor()
 ******************************************/
 void deceiveMontor::receiveProcess(QByteArray buf)
 {
-    DataPacket *packet = NULL;
-    for (int i = 0; i < buf.length(); i++)
-    {
-        packet =  comFormat->Parsing((uint8_t)buf[i]);
-        if (packet != NULL)
-        {
-            qDebug()<<packet->nCMD;
-        }
-    }
+    comDrive->receiveProcess(buf);
+
 }
 /******************************************
  * @函数说明：升级设备固件
@@ -83,6 +80,36 @@ void deceiveMontor::receiveProcess(QByteArray buf)
 ******************************************/
 bool deceiveMontor::updateFirmware(QByteArray binByteArray)
 {
-
     return true;
+}
+
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：无
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void deceiveMontor::deviceConnect()
+{
+    emit updateDeviceInfo("Device Connected");
+}
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：无
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void deceiveMontor::deviceDisconnect()
+{
+    emit updateDeviceInfo("Device Disconnected");
+}
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：无
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void deceiveMontor::writeError()
+{
+    emit updateDeviceInfo("Port Error");
 }
