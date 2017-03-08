@@ -15,5 +15,6 @@
         <file>ico/write.png</file>
         <file>ico/Update.png</file>
         <file>ico/Port.png</file>
+        <file>ico/jump.png</file>
     </qresource>
 </RCC>

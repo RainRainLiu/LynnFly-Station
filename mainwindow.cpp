@@ -14,8 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
     CreatMenu();
     statueLable = new QLabel("未选择端口");
     ui->statusBar->addWidget(statueLable);
-    devMintor = new deceiveMontor();
-    connect(devMintor, SIGNAL(updateDeviceInfo(QString)), this, SLOT(deviceInfo(QString)));
+    bootload = new bootloadProcess();
+    serialPort = new mySerialPort();
+    connect(bootload, SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
+    connect(serialPort, SIGNAL(receiceData(QByteArray)), bootload, SLOT(receiveProcess(QByteArray)));
+    connect(bootload, SIGNAL(deviceConnect()), this, SLOT(deviceConnect()));
+    connect(bootload, SIGNAL(deviceDisconnect()), this, SLOT(deviceDisconnect()));
 }
 
 MainWindow::~MainWindow()
@@ -43,8 +47,12 @@ void MainWindow::CreatMenu()
     QMenu *menuUpdate = ui->menuBar->addMenu(tr("Tools"));
     QAction *action = new QAction(QIcon(":/ico/ico/Update.png"), "Update firmware");
     menuUpdate->addAction(action);
-
     connect(action, SIGNAL(triggered(bool)), this, SLOT(updateFirmware(bool)));
+
+    action = new QAction(QIcon(":/ico/ico/jump.png"), "Run firmware");
+    menuUpdate->addAction(action);
+
+
 }
 
 /******************************************
@@ -56,9 +64,11 @@ void MainWindow::CreatMenu()
 ******************************************/
 void MainWindow::OpenCom(QAction * action)
 {
-    if (devMintor->montorSerialPort(action->text()) == true)
+    serialPort->closePort();
+    if (serialPort->openPortForDef(action->text()) == true)
     {
         statueLable->setText("正在监听： " + action->text());
+        bootload->startHearbeat();
     }
     else
     {
@@ -99,18 +109,20 @@ void MainWindow::updateFirmware(bool b)
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
 
-    if (devMintor->updateFirmware(binArray) == true)
+    if (bootload->updateFirmware(binArray) == true)
     {
         progDlg = new QProgressDialog();
-        progDlg->setWindowTitle("Please wait...");
+        progDlg->setWindowTitle("Downlaod Firmware...");
         progDlg->setFixedWidth(500);
         progDlg->setRange(0, file->size());
         progDlg->show();
-        progDlg->setValue(100);
+        progDlg->setAutoClose(true);
+        progDlg->setAutoReset(false);
+        progDlg->setLabelText("Downlaod Firmware");
 
         connect(progDlg, SIGNAL(canceled()), this, SLOT(progDlogCandeled));
-        connect(devMintor,SIGNAL(updateFirmwareProgress(QString,uint32_t,bool)),
-                this, SLOT(progDlogUpdate(QString,uint32_t,bool)));
+        connect(bootload,SIGNAL(updateFirmwareProgress(uint32_t)),
+                this, SLOT(progDlogUpdate(uint32_t)));
     }
 }
 /******************************************
@@ -119,12 +131,21 @@ void MainWindow::updateFirmware(bool b)
  * @返回参数：无
  * @修订日期：
 ******************************************/
-void MainWindow::progDlogUpdate(QString title, uint32_t progress, bool end)
+void MainWindow::progDlogUpdate(uint32_t progress)
 {
-    end = end;
-    progDlg->setWindowTitle(title);
     progDlg->setValue(progress);
     progDlg->show();
+
+    if (progDlg->value() >= progDlg->maximum())
+    {
+        progDlg->cancel();
+        QMessageBox message(QMessageBox::Information, "Update Firmware Sucess", "Do you want to run firmware?", QMessageBox::Yes | QMessageBox::No, NULL);
+        message.setIconPixmap(QPixmap(":/ico/ico/jump.png"));
+        if(message.exec() == QMessageBox::Yes)
+        {
+                QMessageBox::aboutQt(NULL, "About Qt");
+        }
+    }
 }
 
 /******************************************
@@ -135,8 +156,8 @@ void MainWindow::progDlogUpdate(QString title, uint32_t progress, bool end)
 ******************************************/
 void MainWindow::progDlogCandeled()
 {
-    disconnect(devMintor,SIGNAL(updateFirmwareProgress(QString,uint32_t,bool)),
-               this, SLOT(progDlogUpdate(QString,uint32_t,bool)));
+
+
 }
 
 /******************************************
@@ -145,7 +166,17 @@ void MainWindow::progDlogCandeled()
  * @返回参数：无
  * @修订日期：
 ******************************************/
-void MainWindow::deviceInfo(QString str)
+void MainWindow::deviceConnect()
 {
-    statueLable->setText(str);
+    statueLable->setText("设备已连接···");
+}
+/******************************************
+ * @函数说明：更新固件的动作的槽
+ * @输入参数：
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void MainWindow::deviceDisconnect()
+{
+    statueLable->setText("设备已断开···");
 }

@@ -16,15 +16,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     Componemts/myserialport.cpp \
-    Communication/deceivemontor.cpp \
     Communication/format.cpp \
-    Communication/drive.cpp
+    Communication/bootloadProcess.cpp \
+    Componemts/crc32.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
-    Communication/deceivemontor.h \
     Communication/format.h \
-    Communication/drive.h
+    Communication/bootloadProcess.h \
+    Componemts/crc32.h
 
 FORMS    += mainwindow.ui
 

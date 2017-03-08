@@ -3,8 +3,10 @@
 
 #include <QMainWindow>
 #include "QLabel"
-#include "Communication/deceivemontor.h"
 #include "QProgressDialog"
+#include "Communication/bootloadProcess.h"
+#include "Componemts/myserialport.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,15 +23,17 @@ private slots:
     void OpenCom(QAction * action);
     void updateFirmware(bool b);
     void progDlogCandeled();
-    void progDlogUpdate(QString title, uint32_t progress, bool end);
-    void deviceInfo(QString str);
+    void progDlogUpdate(uint32_t progress);
+    void deviceConnect();
+    void deviceDisconnect();
 
 private:
     Ui::MainWindow *ui;
     void CreatMenu();
     QProgressDialog *progDlg;
     QLabel *statueLable;
-    deceiveMontor *devMintor;
+    mySerialPort *serialPort;
+    bootloadProcess *bootload;
 };
 
 #endif // MAINWINDOW_H

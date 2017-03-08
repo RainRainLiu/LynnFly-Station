@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#define PACKET_DATA_LENGTH  1024
+#define PACKET_DATA_LENGTH  1200
 
 
 typedef struct

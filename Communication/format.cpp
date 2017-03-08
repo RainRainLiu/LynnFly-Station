@@ -127,7 +127,7 @@ DataPacket* format::Parsing(uint8_t inData)
             }
             else
             {
-                packet.nLength |= (data >> 8);
+                packet.nLength |= (data << 8);
                 step++;
                 count = 0;
                 if (packet.nLength == 0)
