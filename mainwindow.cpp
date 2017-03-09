@@ -146,12 +146,12 @@ void MainWindow::updateFirmware(bool b)
 void MainWindow::progDlogUpdate(uint32_t progress)
 {
     progDlg->setValue(progress);
-    progDlg->show();
 
-    if (progDlg->value() >= progDlg->maximum())
+    qDebug()<<("%d", progress);
+    if (progDlg->value() >= progDlg->maximum() && progDlg->wasCanceled() == false)
     {
         progDlg->cancel();
-        QMessageBox message(QMessageBox::Information, "Update Firmware Sucess", "Do you want to run firmware?", QMessageBox::Yes | QMessageBox::No, NULL);
+        QMessageBox message(QMessageBox::Information, "Update Firmware Sucess", "Do you want to run the firmware?", QMessageBox::Yes | QMessageBox::No, NULL);
         message.setIconPixmap(QPixmap(":/ico/ico/jump.png"));
         if(message.exec() == QMessageBox::Yes)
         {

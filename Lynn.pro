@@ -26,7 +26,8 @@ HEADERS  += mainwindow.h \
     Communication/bootloadProcess.h \
     Componemts/crc32.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    UI/updatefirmware.ui
 
 RESOURCES += \
     ico.qrc

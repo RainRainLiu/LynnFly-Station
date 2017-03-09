@@ -285,9 +285,10 @@ void bootloadProcess::downloadFirmwarePack()
     downloadProgress += length;
     currentPackNum++;
     qDebug()<<("currentPackNum = %d", currentPackNum);
-    emit updateFirmwareProgress(downloadProgress);
+
 
     sendPackAndStartRetry(pack);
+    emit updateFirmwareProgress(downloadProgress);
 }
 
 /******************************************
