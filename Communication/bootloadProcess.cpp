@@ -7,7 +7,8 @@
 #define COM_CMD_ERASURE         0X03
 #define COM_CMD_ERASURE_REPORT  0X04
 #define COM_CMD_DOWNLOAD_INFO   0X05
-#define COM_CDM_DOWNLOAD_DATA   0X06
+#define COM_CMD_DOWNLOAD_DATA   0X06
+#define COM_CMD_RUN_FIRMWARE    0X07
 
 
 
@@ -129,6 +130,8 @@ void bootloadProcess::retryTimeOut()
 ******************************************/
 void bootloadProcess::receivePacketProcess(DataPacket *packet)
 {
+    qDebug()<<"CMD";
+    qDebug()<<("%x", packet->nCMD);
     switch(packet->nCMD)
     {
         case COM_CMD_HEARBEAT:
@@ -170,7 +173,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CDM_DOWNLOAD_DATA:
+        case COM_CMD_DOWNLOAD_DATA:
         {
             if (currentPackNum < packetNumber)
             {
@@ -261,7 +264,7 @@ void bootloadProcess::firmwareInfo(QByteArray firmware)
 void bootloadProcess::downloadFirmwarePack()
 {
     DataPacket pack;
-    pack.nCMD = COM_CDM_DOWNLOAD_DATA;
+    pack.nCMD = COM_CMD_DOWNLOAD_DATA;
     pack.nLength = DOWNLOAD_FILE_PACK_SIZE + 4;
     set32Byte((char *)pack.aData, currentPackNum);
 
@@ -284,6 +287,20 @@ void bootloadProcess::downloadFirmwarePack()
     qDebug()<<("currentPackNum = %d", currentPackNum);
     emit updateFirmwareProgress(downloadProgress);
 
+    sendPackAndStartRetry(pack);
+}
+
+/******************************************
+ * @函数说明：擦除
+ * @输入参数：uint32_t size 大小
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void bootloadProcess::runFirmware()
+{
+    DataPacket pack;
+    pack.nCMD = COM_CMD_RUN_FIRMWARE;
+    pack.nLength = 0;
     sendPackAndStartRetry(pack);
 }
 

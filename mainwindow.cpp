@@ -51,7 +51,7 @@ void MainWindow::CreatMenu()
 
     action = new QAction(QIcon(":/ico/ico/jump.png"), "Run firmware");
     menuUpdate->addAction(action);
-
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(runFirmware(bool)));
 
 }
 
@@ -74,6 +74,18 @@ void MainWindow::OpenCom(QAction * action)
     {
         statueLable->setText("端口打开失败： " + action->text());
     }
+}
+
+/******************************************
+ * @函数说明：更新固件的动作的槽
+ * @输入参数：
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void MainWindow::runFirmware(bool b)
+{
+    b = b;
+    bootload->runFirmware();
 }
 
 /******************************************
@@ -143,7 +155,7 @@ void MainWindow::progDlogUpdate(uint32_t progress)
         message.setIconPixmap(QPixmap(":/ico/ico/jump.png"));
         if(message.exec() == QMessageBox::Yes)
         {
-                QMessageBox::aboutQt(NULL, "About Qt");
+            bootload->runFirmware();
         }
     }
 }

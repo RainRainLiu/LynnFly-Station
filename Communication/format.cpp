@@ -200,8 +200,8 @@ QByteArray format::BuildPack(DataPacket *pPack)
     length += DisposeESC(2, &escBuf[length], (uint8_t *)&pPack->nLength);
     length += DisposeESC(pPack->nLength, &escBuf[length], (uint8_t *)&pPack->aData);
 
-
-    escBuf[length++] = CalculateCheckSum(pPack);
+    uint8_t checkSum = CalculateCheckSum(pPack);
+    length += DisposeESC(1, &escBuf[length], &checkSum);
     escBuf[length++] = ETX;
 
     array.append((const char*)escBuf, (int)length);

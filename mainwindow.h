@@ -26,6 +26,7 @@ private slots:
     void progDlogUpdate(uint32_t progress);
     void deviceConnect();
     void deviceDisconnect();
+    void runFirmware(bool b);
 
 private:
     Ui::MainWindow *ui;

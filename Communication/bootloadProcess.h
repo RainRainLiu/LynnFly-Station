@@ -17,6 +17,7 @@ public:
     explicit bootloadProcess(QObject *parent = 0);
     bool updateFirmware(QByteArray binByteArray);   //更新固件
     void startHearbeat();
+    void runFirmware();
 
 private:
     QTimer *hearbeatTimer;  //心跳定时器
