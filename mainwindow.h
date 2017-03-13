@@ -23,10 +23,8 @@ public:
 private slots:
     void OpenCom(QAction * action);
     void updateFirmware(bool b);
-    void progDlogCandeled();
     void progDlogUpdate(uint32_t progress);
-    void deviceConnect();
-    void deviceDisconnect();
+
     void runFirmware(bool b);
 
     void on_updateFirmwareButton_clicked();

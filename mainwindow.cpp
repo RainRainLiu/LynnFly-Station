@@ -11,27 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->backLable->setGeometry(0,0, this->width(), this->height());
-
     serialPort = new mySerialPort();
 
-    foreach (const QSerialPortInfo &Info, QSerialPortInfo::availablePorts())
-    {
-        ui->serialPortComboBox->addItem(Info.portName(), QVariant());
-    }
+    connect(serialPort, SIGNAL(receiceData(QByteArray)), &updateWindow, SLOT(readData(QByteArray)));
+    connect(&updateWindow,SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
 
-
-    /*
     CreatMenu();
-    statueLable = new QLabel("未选择端口");
-    ui->statusBar->addWidget(statueLable);
-    bootload = new bootloadProcess();
-
-    connect(bootload, SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
-    connect(serialPort, SIGNAL(receiceData(QByteArray)), bootload, SLOT(receiveProcess(QByteArray)));
-    connect(bootload, SIGNAL(deviceConnect()), this, SLOT(deviceConnect()));
-    connect(bootload, SIGNAL(deviceDisconnect()), this, SLOT(deviceDisconnect()));
-    */
 }
 
 MainWindow::~MainWindow()
@@ -39,15 +24,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/******************************************
- * @函数说明：
- * @输入参数：
- * @返回参数：
- * @修订日期：
-******************************************/
 void MainWindow::CreatMenu()
-{/*
+{
     QMenu *menu = ui->menuBar->addMenu(tr("SerialPort"));
+
+    QAction *action = new QAction(QIcon(":/ico/ico/find.png"), "Scan Port");
+    menu->addAction(action);
 
     foreach (const QSerialPortInfo &Info, QSerialPortInfo::availablePorts())
     {
@@ -55,18 +37,8 @@ void MainWindow::CreatMenu()
         menu->addAction(action);
     }
     connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(OpenCom(QAction*)));
-
-    QMenu *menuUpdate = ui->menuBar->addMenu(tr("Tools"));
-    QAction *action = new QAction(QIcon(":/ico/ico/Update.png"), "Update firmware");
-    menuUpdate->addAction(action);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(updateFirmware(bool)));
-
-    action = new QAction(QIcon(":/ico/ico/jump.png"), "Run firmware");
-    menuUpdate->addAction(action);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(runFirmware(bool)));
-    */
-
 }
+
 
 /******************************************
  * @函数说明：选择端口的信号槽
@@ -77,15 +49,26 @@ void MainWindow::CreatMenu()
 ******************************************/
 void MainWindow::OpenCom(QAction * action)
 {
-    serialPort->closePort();
-    if (serialPort->openPortForDef(action->text()) == true)
+    if (action->text() == "Scan Port")
     {
-        statueLable->setText("正在监听： " + action->text());
-        bootload->startHearbeat();
+        ui->menuBar->clear();
+        CreatMenu();
+        return;
+    }
+    serialPort->closePort();
+    if (serialPort->openPortForDef(action->text()) == false)
+    {
+        ui->updateFirmwareButton->setEnabled(false);
+        ui->updateFirmwareLabe->setEnabled(false);
+
+        QMessageBox message(QMessageBox::Information, "Serial Port Error", "Unable to open port!", QMessageBox::Yes, NULL);
+        message.setIconPixmap(QPixmap(":/ico/ico/close.png"));
+        message.exec();
     }
     else
     {
-        statueLable->setText("端口打开失败： " + action->text());
+        ui->updateFirmwareButton->setEnabled(true);
+        ui->updateFirmwareLabe->setEnabled(true);
     }
 }
 
@@ -173,38 +156,9 @@ void MainWindow::progDlogUpdate(uint32_t progress)
     }
 }
 
-/******************************************
- * @函数说明：更新固件的动作的槽
- * @输入参数：
- * @返回参数：无
- * @修订日期：
-******************************************/
-void MainWindow::progDlogCandeled()
-{
 
 
-}
 
-/******************************************
- * @函数说明：更新固件的动作的槽
- * @输入参数：
- * @返回参数：无
- * @修订日期：
-******************************************/
-void MainWindow::deviceConnect()
-{
-    statueLable->setText("设备已连接···");
-}
-/******************************************
- * @函数说明：更新固件的动作的槽
- * @输入参数：
- * @返回参数：无
- * @修订日期：
-******************************************/
-void MainWindow::deviceDisconnect()
-{
-    statueLable->setText("设备已断开···");
-}
 
 
 

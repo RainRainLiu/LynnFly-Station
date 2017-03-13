@@ -7,73 +7,127 @@
     <x>0</x>
     <y>0</y>
     <width>760</width>
-    <height>250</height>
+    <height>266</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Update Firmware</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../ico.qrc">
+    <normaloff>:/ico/ico/Update.png</normaloff>:/ico/ico/Update.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_12">
+   <layout class="QGridLayout" name="gridLayout_15">
     <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout_11">
+     <layout class="QGridLayout" name="gridLayout_14">
       <item row="0" column="0">
-       <layout class="QGridLayout" name="gridLayout_10">
+       <layout class="QGridLayout" name="gridLayout_12">
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
            <string>Device Information</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_4">
+          <layout class="QGridLayout" name="gridLayout_11">
            <item row="0" column="0">
-            <layout class="QGridLayout" name="gridLayout_3">
+            <layout class="QGridLayout" name="gridLayout_10">
              <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayout_2">
+              <layout class="QGridLayout" name="gridLayout_3">
                <item row="0" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="font">
-                  <font>
-                   <family>宋体</family>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Bootloader version：</string>
-                 </property>
-                </widget>
+                <layout class="QGridLayout" name="gridLayout_2">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Bootloader version：</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_4">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Firmware version：</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_3">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Flash size：</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_4">
-                 <property name="font">
-                  <font>
-                   <family>宋体</family>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Application version：</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="font">
-                  <font>
-                   <family>宋体</family>
-                   <pointsize>12</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Flash size：</string>
-                 </property>
-                </widget>
+               <item row="0" column="1">
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="bootloaderVersionLabel">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>1.0.1.2017313</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="firmwareVersionLabel">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>1.0.1.2017313</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="flashSizeLabel">
+                   <property name="font">
+                    <font>
+                     <family>宋体</family>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>128Kbyte</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </item>
-             <item row="0" column="1">
-              <layout class="QGridLayout" name="gridLayout">
+             <item row="1" column="0">
+              <layout class="QGridLayout" name="gridLayout_4">
                <item row="0" column="0">
-                <widget class="QLabel" name="label_2">
+                <widget class="QPushButton" name="eraseButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="font">
                   <font>
                    <family>宋体</family>
@@ -81,12 +135,25 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>NULL</string>
+                  <string>Erase Firmware</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../ico.qrc">
+                   <normaloff>:/ico/ico/empty_bin.png</normaloff>:/ico/ico/empty_bin.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_5">
+               <item row="0" column="1">
+                <widget class="QPushButton" name="runButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="font">
                   <font>
                    <family>宋体</family>
@@ -94,20 +161,17 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>NULL</string>
+                  <string>Run Firmware</string>
                  </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="font">
-                  <font>
-                   <family>宋体</family>
-                   <pointsize>12</pointsize>
-                  </font>
+                 <property name="icon">
+                  <iconset resource="../ico.qrc">
+                   <normaloff>:/ico/ico/jump.png</normaloff>:/ico/ico/jump.png</iconset>
                  </property>
-                 <property name="text">
-                  <string>NULL</string>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
                  </property>
                 </widget>
                </item>
@@ -121,11 +185,11 @@
         <item row="0" column="1">
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
-           <string>GroupBox</string>
+           <string>Firmware Seting</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_14">
+          <layout class="QGridLayout" name="gridLayout_9">
            <item row="0" column="0">
-            <layout class="QGridLayout" name="gridLayout_13">
+            <layout class="QGridLayout" name="gridLayout_8">
              <item row="0" column="0">
               <layout class="QGridLayout" name="gridLayout_6">
                <item row="0" column="0">
@@ -137,7 +201,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Firmware</string>
+                  <string>Firmware Path:</string>
                  </property>
                 </widget>
                </item>
@@ -150,7 +214,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Address offset</string>
+                  <string>Address offset:</string>
                  </property>
                 </widget>
                </item>
@@ -163,21 +227,21 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Version</string>
+                  <string>Version:</string>
                  </property>
                 </widget>
                </item>
               </layout>
              </item>
              <item row="0" column="1">
-              <layout class="QGridLayout" name="gridLayout_9">
+              <layout class="QGridLayout" name="gridLayout_7">
                <item row="0" column="0">
                 <layout class="QGridLayout" name="gridLayout_5">
                  <item row="0" column="0">
-                  <widget class="QLineEdit" name="lineEdit"/>
+                  <widget class="QLineEdit" name="pathEdit"/>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QToolButton" name="toolButton">
+                  <widget class="QToolButton" name="filePathButton">
                    <property name="text">
                     <string>...</string>
                    </property>
@@ -186,68 +250,78 @@
                 </layout>
                </item>
                <item row="1" column="0">
-                <layout class="QGridLayout" name="gridLayout_8">
-                 <item row="0" column="0">
-                  <layout class="QGridLayout" name="gridLayout_7">
-                   <item row="0" column="0">
-                    <widget class="QLineEdit" name="lineEdit_2">
-                     <property name="text">
-                      <string>3600</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLineEdit" name="lineEdit_3"/>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QPushButton" name="pushButton">
-                   <property name="font">
-                    <font>
-                     <family>宋体</family>
-                     <pointsize>12</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Update</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QLineEdit" name="addressEdit">
+                 <property name="text">
+                  <string>0x3600</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLineEdit" name="versionEdit">
+                 <property name="text">
+                  <string>1.0.0.20170313</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
             </layout>
            </item>
           </layout>
-          <zorder>lineEdit</zorder>
-          <zorder>toolButton</zorder>
-          <zorder>lineEdit_2</zorder>
-          <zorder>label_7</zorder>
-          <zorder>label_8</zorder>
           <zorder></zorder>
-          <zorder>lineEdit</zorder>
-          <zorder>pushButton</zorder>
-          <zorder>label_9</zorder>
-          <zorder>lineEdit_3</zorder>
+          <zorder>checkBox</zorder>
          </widget>
         </item>
        </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QProgressBar" name="progressBar">
-        <property name="value">
-         <number>24</number>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_13">
+        <item row="0" column="0">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="updateButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="font">
+           <font>
+            <family>宋体</family>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Update</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../ico.qrc">
+            <normaloff>:/ico/ico/Update.png</normaloff>:/ico/ico/Update.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
    </layout>
+   <zorder>updateButton</zorder>
+   <zorder>checkBox_2</zorder>
+   <zorder>groupBox_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="../ico.qrc"/>
+ </resources>
  <connections/>
 </ui>
