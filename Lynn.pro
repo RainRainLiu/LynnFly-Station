@@ -18,15 +18,18 @@ SOURCES += main.cpp\
     Componemts/myserialport.cpp \
     Communication/format.cpp \
     Communication/bootloadProcess.cpp \
-    Componemts/crc32.cpp
+    Componemts/crc32.cpp \
+    UpdateFirmware/updatefirmware.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
     Communication/format.h \
     Communication/bootloadProcess.h \
-    Componemts/crc32.h
+    Componemts/crc32.h \
+    UpdateFirmware/updatefirmware.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    UpdateFirmware/updatefirmware.ui
 
 RESOURCES += \
     ico.qrc

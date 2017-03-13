@@ -11,15 +11,27 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->backLable->setGeometry(0,0, this->width(), this->height());
+
+    serialPort = new mySerialPort();
+
+    foreach (const QSerialPortInfo &Info, QSerialPortInfo::availablePorts())
+    {
+        ui->serialPortComboBox->addItem(Info.portName(), QVariant());
+    }
+
+
+    /*
     CreatMenu();
     statueLable = new QLabel("未选择端口");
     ui->statusBar->addWidget(statueLable);
     bootload = new bootloadProcess();
-    serialPort = new mySerialPort();
+
     connect(bootload, SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
     connect(serialPort, SIGNAL(receiceData(QByteArray)), bootload, SLOT(receiveProcess(QByteArray)));
     connect(bootload, SIGNAL(deviceConnect()), this, SLOT(deviceConnect()));
     connect(bootload, SIGNAL(deviceDisconnect()), this, SLOT(deviceDisconnect()));
+    */
 }
 
 MainWindow::~MainWindow()
@@ -34,7 +46,7 @@ MainWindow::~MainWindow()
  * @修订日期：
 ******************************************/
 void MainWindow::CreatMenu()
-{
+{/*
     QMenu *menu = ui->menuBar->addMenu(tr("SerialPort"));
 
     foreach (const QSerialPortInfo &Info, QSerialPortInfo::availablePorts())
@@ -52,6 +64,7 @@ void MainWindow::CreatMenu()
     action = new QAction(QIcon(":/ico/ico/jump.png"), "Run firmware");
     menuUpdate->addAction(action);
     connect(action, SIGNAL(triggered(bool)), this, SLOT(runFirmware(bool)));
+    */
 
 }
 
@@ -191,4 +204,23 @@ void MainWindow::deviceConnect()
 void MainWindow::deviceDisconnect()
 {
     statueLable->setText("设备已断开···");
+}
+
+
+
+void MainWindow::on_updateFirmwareButton_clicked()
+{
+    updateWindow.show();
+}
+
+
+void MainWindow::on_serialPortComboBox_activated(const QString &arg1)
+{
+    serialPort->closePort();
+    if (serialPort->openPortForDef(arg1) == false)
+    {
+        QMessageBox message(QMessageBox::Information, "Serial Port Error", "Unable to open port!", QMessageBox::Yes, NULL);
+        message.setIconPixmap(QPixmap(":/ico/ico/close.png"));
+        message.exec();
+    }
 }

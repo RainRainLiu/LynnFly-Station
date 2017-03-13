@@ -17,4 +17,7 @@
         <file>ico/Port.png</file>
         <file>ico/jump.png</file>
     </qresource>
+    <qresource prefix="/Image">
+        <file>Image/startImage.jpg</file>
+    </qresource>
 </RCC>

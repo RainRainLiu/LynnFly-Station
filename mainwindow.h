@@ -6,6 +6,7 @@
 #include "QProgressDialog"
 #include "Communication/bootloadProcess.h"
 #include "Componemts/myserialport.h"
+#include "UpdateFirmware/updatefirmware.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,8 +29,14 @@ private slots:
     void deviceDisconnect();
     void runFirmware(bool b);
 
+    void on_updateFirmwareButton_clicked();
+
+    void on_serialPortComboBox_activated(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
+
+    UpdateFirmware updateWindow;
     void CreatMenu();
     QProgressDialog *progDlg;
     QLabel *statueLable;
