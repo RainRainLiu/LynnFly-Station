@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "QTimer"
-#include "format.h"
+#include "Componemts/communicationFormat.h"
 
 
 #define HERARBEAT_TIME_OUT_TIME     500
@@ -15,14 +15,25 @@ class bootloadProcess : public QObject
     Q_OBJECT
 public:
     explicit bootloadProcess(QObject *parent = 0);
-    bool updateFirmware(QByteArray binByteArray);   //更新固件
+    bool updateFirmware(QByteArray binByteArray, QString version, uint32_t offserAddr);   //更新固件
     void startHearbeat();
     void runFirmware();
+    void erase(uint32_t size);
+    typedef enum
+    {
+        deviceConnectState,         //设备连接上
+        earse,                      //擦除
+        writeFirmwareInfo,          //写入固件信息
+        downloadFirmware,           //下载固件
+
+    }ProcessResult;
+
+
 
 private:
     QTimer *hearbeatTimer;  //心跳定时器
     QTimer *retryTimer;     //重发
-    format *comFormat;      //格式
+    communicationFormat *comFormat;      //格式
     DataPacket latestPacket;    //最新发送数据包
     uint8_t retryCount;     //重试次数
     bool connected;         //连接标志
@@ -33,7 +44,6 @@ private:
 
     void sendPackAndStartRetry(DataPacket packet);
     void receivePacketProcess(DataPacket *packet);
-    void erase(uint32_t size);
     void firmwareInfo(QByteArray firmware);
     void downloadFirmwarePack();
 

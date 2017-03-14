@@ -15,12 +15,22 @@ UpdateFirmware::~UpdateFirmware()
     delete ui;
 }
 
-
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：QByteArray binByteArray 固件
+ * @返回参数：无
+ * @修订日期：
+******************************************/
 void UpdateFirmware::readData(QByteArray array)
 {
 
 }
-
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：QByteArray binByteArray 固件
+ * @返回参数：无
+ * @修订日期：
+******************************************/
 void UpdateFirmware::on_filePathButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>760</width>
-    <height>266</height>
+    <height>299</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -269,7 +269,6 @@
            </item>
           </layout>
           <zorder></zorder>
-          <zorder>checkBox</zorder>
          </widget>
         </item>
        </layout>
@@ -278,8 +277,11 @@
        <layout class="QGridLayout" name="gridLayout_13">
         <item row="0" column="0">
          <widget class="QProgressBar" name="progressBar">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="value">
-           <number>24</number>
+           <number>0</number>
           </property>
          </widget>
         </item>
@@ -314,9 +316,6 @@
      </layout>
     </item>
    </layout>
-   <zorder>updateButton</zorder>
-   <zorder>checkBox_2</zorder>
-   <zorder>groupBox_2</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

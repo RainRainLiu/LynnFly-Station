@@ -16,17 +16,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     Componemts/myserialport.cpp \
-    Communication/format.cpp \
-    Communication/bootloadProcess.cpp \
     Componemts/crc32.cpp \
-    UpdateFirmware/updatefirmware.cpp
+    UpdateFirmware/updatefirmware.cpp \
+    Componemts/communicationFormat.cpp \
+    UpdateFirmware/bootloadProcess.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
-    Communication/format.h \
-    Communication/bootloadProcess.h \
     Componemts/crc32.h \
-    UpdateFirmware/updatefirmware.h
+    UpdateFirmware/updatefirmware.h \
+    Componemts/communicationFormat.h \
+    UpdateFirmware/bootloadProcess.h
 
 FORMS    += mainwindow.ui \
     UpdateFirmware/updatefirmware.ui

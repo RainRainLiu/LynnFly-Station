@@ -14,7 +14,7 @@
 
 bootloadProcess::bootloadProcess(QObject *parent) : QObject(parent)
 {
-    comFormat = new format();
+    comFormat = new communicationFormat();
     retryTimer = new QTimer();
     hearbeatTimer = new QTimer();
     connect(retryTimer, SIGNAL(timeout()), this, SLOT(retryTimeOut()));
@@ -29,7 +29,7 @@ bootloadProcess::bootloadProcess(QObject *parent) : QObject(parent)
  * @返回参数：无
  * @修订日期：
 ******************************************/
-bool bootloadProcess::updateFirmware(QByteArray binByteArray)
+bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, uint32_t offserAddr)
 {
     firmware = binByteArray;
     erase(firmware.length());
@@ -130,8 +130,8 @@ void bootloadProcess::retryTimeOut()
 ******************************************/
 void bootloadProcess::receivePacketProcess(DataPacket *packet)
 {
-    qDebug()<<"CMD";
-    qDebug()<<("%x", packet->nCMD);
+    //qDebug()<<"CMD";
+    //qDebug()<<("%x", packet->nCMD);
     switch(packet->nCMD)
     {
         case COM_CMD_HEARBEAT:
@@ -251,7 +251,7 @@ void bootloadProcess::firmwareInfo(QByteArray firmware)
         packetNumber += 1;
     }
     set32Byte((char *)&pack.aData[8], packetNumber);
-    qDebug()<<("packetNumber = %d", packetNumber);
+    //qDebug()<<("packetNumber = %d", packetNumber);
     sendPackAndStartRetry(pack);
 }
 
@@ -284,7 +284,7 @@ void bootloadProcess::downloadFirmwarePack()
 
     downloadProgress += length;
     currentPackNum++;
-    qDebug()<<("currentPackNum = %d", currentPackNum);
+    //qDebug()<<("currentPackNum = %d", currentPackNum);
     emit updateFirmwareProgress(downloadProgress);
 
     sendPackAndStartRetry(pack);

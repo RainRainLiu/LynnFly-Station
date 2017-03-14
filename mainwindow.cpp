@@ -59,7 +59,7 @@ void MainWindow::OpenCom(QAction * action)
     if (serialPort->openPortForDef(action->text()) == false)
     {
         ui->updateFirmwareButton->setEnabled(false);
-        ui->updateFirmwareLabe->setEnabled(false);
+
 
         QMessageBox message(QMessageBox::Information, "Serial Port Error", "Unable to open port!", QMessageBox::Yes, NULL);
         message.setIconPixmap(QPixmap(":/ico/ico/close.png"));
@@ -68,7 +68,6 @@ void MainWindow::OpenCom(QAction * action)
     else
     {
         ui->updateFirmwareButton->setEnabled(true);
-        ui->updateFirmwareLabe->setEnabled(true);
     }
 }
 
@@ -81,7 +80,6 @@ void MainWindow::OpenCom(QAction * action)
 void MainWindow::runFirmware(bool b)
 {
     b = b;
-    bootload->runFirmware();
 }
 
 /******************************************
@@ -116,7 +114,7 @@ void MainWindow::updateFirmware(bool b)
     binFile.readRawData(buff, (qint64)file->size());    //读取文件
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
-
+/*
     if (bootload->updateFirmware(binArray) == true)
     {
         progDlg = new QProgressDialog();
@@ -132,6 +130,7 @@ void MainWindow::updateFirmware(bool b)
         connect(bootload,SIGNAL(updateFirmwareProgress(uint32_t)),
                 this, SLOT(progDlogUpdate(uint32_t)));
     }
+    */
 }
 /******************************************
  * @函数说明：更新固件的动作的槽
@@ -140,7 +139,7 @@ void MainWindow::updateFirmware(bool b)
  * @修订日期：
 ******************************************/
 void MainWindow::progDlogUpdate(uint32_t progress)
-{
+{/*
     progDlg->setValue(progress);
     progDlg->show();
 
@@ -153,7 +152,7 @@ void MainWindow::progDlogUpdate(uint32_t progress)
         {
             bootload->runFirmware();
         }
-    }
+    }*/
 }
 
 

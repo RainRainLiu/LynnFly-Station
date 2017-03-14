@@ -1,10 +1,12 @@
-#include "format.h"
+#include "communicationFormat.h"
+
 const uint8_t   STX = 0xeb;
 const uint8_t   ETX = 0x30;
 const uint8_t   ESC = 0xef;
 
-format::format(QObject *parent) : QObject(parent)
+communicationFormat::communicationFormat(QObject *parent) : QObject(parent)
 {
+
 }
 /******************************************************************
   * @ Name          : void ReceiveError(DataPack_typdef *data_pack)
@@ -14,13 +16,13 @@ format::format(QObject *parent) : QObject(parent)
   * @ Return        : None
   * @ Modify the record : ---
 ******************************************************************/
-void format::ReceiveError()
+void communicationFormat::ReceiveError()
 {
     ErrorNumber = step;
     step = 0;
 }
 
-uint8_t CalculateCheckSum(DataPacket *pPack)
+static uint8_t CalculateCheckSum(DataPacket *pPack)
 {
     uint8_t checkSum = STX;
 
@@ -75,7 +77,7 @@ static uint16_t DisposeESC(uint32_t nLength, uint8_t *pOut, const uint8_t *pIn)
   * @ Return        : None
   * @ Modify the record : ---
 ******************************************************************/
-DataPacket* format::Parsing(uint8_t inData)
+DataPacket* communicationFormat::Parsing(uint8_t inData)
 {
     uint8_t data;
 
@@ -183,7 +185,7 @@ DataPacket* format::Parsing(uint8_t inData)
   * @ Return        : None
   * @ Modify the record : ---
 *****************************************************************/
-QByteArray format::BuildPack(DataPacket *pPack)
+QByteArray communicationFormat::BuildPack(DataPacket *pPack)
 {
     if (pPack->nLength > PACKET_DATA_LENGTH)
     {
@@ -208,5 +210,3 @@ QByteArray format::BuildPack(DataPacket *pPack)
 
     return array;
 }
-
-

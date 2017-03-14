@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "QLabel"
 #include "QProgressDialog"
-#include "Communication/bootloadProcess.h"
 #include "Componemts/myserialport.h"
 #include "UpdateFirmware/updatefirmware.h"
 
@@ -36,10 +35,9 @@ private:
 
     UpdateFirmware updateWindow;
     void CreatMenu();
-    QProgressDialog *progDlg;
     QLabel *statueLable;
     mySerialPort *serialPort;
-    bootloadProcess *bootload;
+
 };
 
 #endif // MAINWINDOW_H
