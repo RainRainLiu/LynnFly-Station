@@ -29,9 +29,11 @@ bootloadProcess::bootloadProcess(QObject *parent) : QObject(parent)
  * @返回参数：无
  * @修订日期：
 ******************************************/
-bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, uint32_t offserAddr)
+bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, uint32_t offsetAddr)
 {
     firmware = binByteArray;
+    firmwarVersion = version;
+    firmwareOffsetAddress = offsetAddr;
     erase(firmware.length());
     return true;
 }
@@ -83,7 +85,7 @@ void bootloadProcess::sendPackAndStartRetry(DataPacket packet)
     }
     else
     {
-        emit writeError();
+        emit bootloadEvent(WRITE_ERROR, NULL);
     }
 }
 
@@ -104,8 +106,8 @@ void bootloadProcess::retryTimeOut()
         }
         if (connected == true)
         {
-            emit deviceDisconnect(); //设备断开连接
             connected = false;
+            emit bootloadEvent(CONNECT_STATE, &connected); //设备断开连接
         }
         hearbeatTimer->start();
     }
@@ -117,7 +119,7 @@ void bootloadProcess::retryTimeOut()
         }
         else
         {
-            emit writeError();
+            emit bootloadEvent(WRITE_ERROR, NULL);
         }
     }
 }
@@ -139,7 +141,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
             if (connected == false)
             {
                 connected = true;
-                emit deviceConnect();
+                emit bootloadEvent(CONNECT_STATE, &connected); //设备连接
             }
             startHearbeat();
         }

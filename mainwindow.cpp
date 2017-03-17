@@ -13,8 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     serialPort = new mySerialPort();
 
-    connect(serialPort, SIGNAL(receiceData(QByteArray)), &updateWindow, SLOT(readData(QByteArray)));
-    connect(&updateWindow,SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
+
 
     CreatMenu();
 }
@@ -163,7 +162,10 @@ void MainWindow::progDlogUpdate(uint32_t progress)
 
 void MainWindow::on_updateFirmwareButton_clicked()
 {
-    updateWindow.show();
+    updateWindow = new UpdateFirmware();
+    connect(serialPort, SIGNAL(receiceData(QByteArray)), updateWindow, SLOT(readData(QByteArray)));
+    connect(updateWindow,SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
+    updateWindow->show();
 }
 
 

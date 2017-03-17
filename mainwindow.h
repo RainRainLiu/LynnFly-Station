@@ -33,7 +33,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    UpdateFirmware updateWindow;
+    UpdateFirmware *updateWindow;
     void CreatMenu();
     QLabel *statueLable;
     mySerialPort *serialPort;

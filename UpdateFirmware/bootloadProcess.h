@@ -15,18 +15,18 @@ class bootloadProcess : public QObject
     Q_OBJECT
 public:
     explicit bootloadProcess(QObject *parent = 0);
-    bool updateFirmware(QByteArray binByteArray, QString version, uint32_t offserAddr);   //更新固件
+    bool updateFirmware(QByteArray binByteArray, QString version, uint32_t offsetAddr);   //更新固件
     void startHearbeat();
     void runFirmware();
     void erase(uint32_t size);
     typedef enum
     {
-        deviceConnectState,         //设备连接上
-        earse,                      //擦除
-        writeFirmwareInfo,          //写入固件信息
-        downloadFirmware,           //下载固件
-
-    }ProcessResult;
+        WRITE_ERROR,
+        CONNECT_STATE,              //设备连接的状态     bool
+        EARSE_RESULT,               //擦除结果          bool
+        WRITE_INFO_RESULT,          //写入固件信息结果    bool
+        DLOWNLOAD_PROGRESS,         //下载固件进度       u32
+    }BOOTLOAD_EVENT_T;
 
 
 
@@ -38,6 +38,9 @@ private:
     uint8_t retryCount;     //重试次数
     bool connected;         //连接标志
     QByteArray firmware;    //固件
+    QString firmwarVersion; //固件版本
+    uint32_t firmwareOffsetAddress; //固件偏移地址
+
     uint32_t currentPackNum;
     uint32_t packetNumber;
     uint32_t downloadProgress;
@@ -50,9 +53,8 @@ private:
 signals:
     int writeData(QByteArray array);    //数据出口
     void updateFirmwareProgress(uint32_t progress); //更新固件进度
-    void deviceConnect();       //设备连接
-    void deviceDisconnect();    //设备断开
-    void writeError();          //写错误
+    void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
+
 
 public slots:
     void receiveProcess(QByteArray buf);    //接收数据

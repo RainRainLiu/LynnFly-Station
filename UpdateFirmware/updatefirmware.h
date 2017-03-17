@@ -2,7 +2,7 @@
 #define UPDATEFIRMWARE_H
 
 #include <QMainWindow>
-
+#include "bootloadProcess.h"
 namespace Ui {
 class UpdateFirmware;
 }
@@ -17,6 +17,7 @@ public:
 
 private:
     Ui::UpdateFirmware *ui;
+    bootloadProcess *boot;
 
 
 public slots:
@@ -28,6 +29,8 @@ signals:
 
 private slots:
     void on_filePathButton_clicked();
+    int bootloadWrite(QByteArray array);
+    void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
 };
 
 #endif // UPDATEFIRMWARE_H
