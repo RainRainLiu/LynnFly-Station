@@ -28,8 +28,6 @@ public:
         DLOWNLOAD_PROGRESS,         //下载固件进度       u32
     }BOOTLOAD_EVENT_T;
 
-
-
 private:
     QTimer *hearbeatTimer;  //心跳定时器
     QTimer *retryTimer;     //重发
@@ -49,12 +47,13 @@ private:
     void receivePacketProcess(DataPacket *packet);
     void firmwareInfo(QByteArray firmware);
     void downloadFirmwarePack();
+    void getInfo();
 
 signals:
     int writeData(QByteArray array);    //数据出口
     void updateFirmwareProgress(uint32_t progress); //更新固件进度
     void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
-
+    void bootloadInfo(QString bootloadVersion, QString firmwareVersion, bool firmwareState);
 
 public slots:
     void receiveProcess(QByteArray buf);    //接收数据

@@ -31,6 +31,8 @@ private slots:
     void on_filePathButton_clicked();
     int bootloadWrite(QByteArray array);
     void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
+    void bootloadInfo(QString bootVsersion, QString firemwareVersion, bool state);
+
 };
 
 #endif // UPDATEFIRMWARE_H

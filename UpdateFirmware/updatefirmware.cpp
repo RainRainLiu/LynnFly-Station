@@ -13,6 +13,7 @@ UpdateFirmware::UpdateFirmware(QWidget *parent) :
     connect(boot, SIGNAL(writeData(QByteArray)),this, SLOT(bootloadWrite(QByteArray)));
     connect(boot, SIGNAL(bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T,void*)),
             this ,SLOT(bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T,void*)));
+    connect(boot, SIGNAL(bootloadInfo(QString,QString,bool)), this, SLOT(bootloadInfo(QString,QString,bool)));
 }
 
 UpdateFirmware::~UpdateFirmware()
@@ -111,4 +112,27 @@ void UpdateFirmware::on_filePathButton_clicked()
     binFile.readRawData(buff, (qint64)file->size());    //读取文件
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
+}
+
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：QByteArray binByteArray 固件
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void UpdateFirmware::bootloadInfo(QString bootVsersion, QString firemwareVersion, bool state)
+{
+    ui->bootloaderVersionLabel->setText(bootVsersion);
+
+    if (state)
+    {
+        ui->firmwareVersionLabel->setText(firemwareVersion);
+        ui->runButton->setEnabled(true);
+    }
+    else
+    {
+        ui->firmwareVersionLabel->setText("Invalid");
+        ui->runButton->setEnabled(false);
+    }
+
 }

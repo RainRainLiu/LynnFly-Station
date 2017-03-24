@@ -141,6 +141,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
             if (connected == false)
             {
                 connected = true;
+                getInfo();
                 emit bootloadEvent(CONNECT_STATE, &connected); //设备连接
             }
             startHearbeat();
@@ -149,7 +150,16 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
 
         case COM_CMD_INFO:
         {
-
+            QString bootloadVersion = QString::fromLocal8Bit((const char *)&packet->aData[1], (int)packet->aData[0]);
+            QString firmwareVersion = QString::fromLocal8Bit((const QChar *)&packet->aData[packet->aData[0] + 2], (int)packet->aData[packet->aData[0] + 1]);
+            if (packet->aData[packet->nLength - 1] == 0)
+            {
+                emit bootloadInfo( bootloadVersion, firmwareVersion, true);
+            }
+            else
+            {
+                emit bootloadInfo(bootloadVersion, firmwareVersion, false);
+            }
         }
         break;
 
@@ -293,8 +303,8 @@ void bootloadProcess::downloadFirmwarePack()
 }
 
 /******************************************
- * @函数说明：擦除
- * @输入参数：uint32_t size 大小
+ * @函数说明：运行固件
+ * @输入参数：无
  * @返回参数：无
  * @修订日期：
 ******************************************/
@@ -302,6 +312,19 @@ void bootloadProcess::runFirmware()
 {
     DataPacket pack;
     pack.nCMD = COM_CMD_RUN_FIRMWARE;
+    pack.nLength = 0;
+    sendPackAndStartRetry(pack);
+}
+/******************************************
+ * @函数说明：运行固件
+ * @输入参数：无
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void bootloadProcess::getInfo()
+{
+    DataPacket pack;
+    pack.nCMD = COM_CMD_INFO;
     pack.nLength = 0;
     sendPackAndStartRetry(pack);
 }
