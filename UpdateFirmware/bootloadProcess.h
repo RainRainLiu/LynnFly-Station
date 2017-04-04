@@ -36,8 +36,9 @@ private:
     uint8_t retryCount;     //重试次数
     bool connected;         //连接标志
     QByteArray firmware;    //固件
-    QString firmwarVersion; //固件版本
+    QString firmwareVersion; //固件版本
     uint32_t firmwareOffsetAddress; //固件偏移地址
+    bool downloadFlag;
 
     uint32_t currentPackNum;
     uint32_t packetNumber;
@@ -45,7 +46,7 @@ private:
 
     void sendPackAndStartRetry(DataPacket packet);
     void receivePacketProcess(DataPacket *packet);
-    void firmwareInfo(QByteArray firmware);
+    void firmwareInfo(QByteArray firmware, QString version, uint32_t offsetAddress);
     void downloadFirmwarePack();
     void getInfo();
 

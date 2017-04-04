@@ -19,7 +19,6 @@ private:
     Ui::UpdateFirmware *ui;
     bootloadProcess *boot;
 
-
 public slots:
     void readData(QByteArray array);
 
@@ -33,6 +32,7 @@ private slots:
     void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
     void bootloadInfo(QString bootVsersion, QString firemwareVersion, bool state);
 
+    void on_updateButton_clicked();
 };
 
 #endif // UPDATEFIRMWARE_H

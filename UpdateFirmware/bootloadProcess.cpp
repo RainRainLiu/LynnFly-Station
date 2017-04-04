@@ -20,6 +20,7 @@ bootloadProcess::bootloadProcess(QObject *parent) : QObject(parent)
     connect(retryTimer, SIGNAL(timeout()), this, SLOT(retryTimeOut()));
     connect(hearbeatTimer, SIGNAL(timeout()), this, SLOT(sendHearbeat()));
     connected = false;
+    downloadFlag = false;
 
 }
 
@@ -32,8 +33,15 @@ bootloadProcess::bootloadProcess(QObject *parent) : QObject(parent)
 bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, uint32_t offsetAddr)
 {
     firmware = binByteArray;
-    firmwarVersion = version;
+    firmwareVersion = version;
     firmwareOffsetAddress = offsetAddr;
+    downloadFlag = true;
+    packetNumber = firmware.length() / DOWNLOAD_FILE_PACK_SIZE;
+    if (firmware.length() % DOWNLOAD_FILE_PACK_SIZE > 0)
+    {
+        packetNumber += 1;
+    }
+    currentPackNum = 0;
     erase(firmware.length());
     return true;
 }
@@ -151,7 +159,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         case COM_CMD_INFO:
         {
             QString bootloadVersion = QString::fromLocal8Bit((const char *)&packet->aData[1], (int)packet->aData[0]);
-            QString firmwareVersion = QString::fromLocal8Bit((const QChar *)&packet->aData[packet->aData[0] + 2], (int)packet->aData[packet->aData[0] + 1]);
+            QString firmwareVersion = QString::fromLocal8Bit((const char *)&packet->aData[packet->aData[0] + 2], (int)packet->aData[packet->aData[0] + 1]);
             if (packet->aData[packet->nLength - 1] == 0)
             {
                 emit bootloadInfo( bootloadVersion, firmwareVersion, true);
@@ -172,16 +180,37 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         case COM_CMD_ERASURE_REPORT:
         {
             qDebug()<<"Earsure Sucess";
-            firmwareInfo(firmware);
+            bool ok;
+            if (packet->aData[0] == 0)
+            {
+                ok = true;
+            }
+            else
+            {
+                ok = false;
+            }
+            emit bootloadEvent(EARSE_RESULT, &ok);
+            if (downloadFlag == true)
+            {
+                firmwareInfo(firmware, firmwareVersion, firmwareOffsetAddress);
+            }
         }
         break;
 
         case COM_CMD_DOWNLOAD_INFO:
         {
-            currentPackNum = 0;
-            downloadProgress = 0;
-            downloadFirmwarePack();
-
+            bool ok;
+            if (packet->aData[0] == 0)
+            {
+                ok = true;
+                qDebug()<<"DOWNLOAD_INFO Sucess";
+                downloadFirmwarePack();
+            }
+            else
+            {
+                ok = false;
+            }
+            emit bootloadEvent(WRITE_INFO_RESULT, &ok);
         }
         break;
 
@@ -248,22 +277,25 @@ void bootloadProcess::erase(uint32_t size)
  * @返回参数：无
  * @修订日期：
 ******************************************/
-void bootloadProcess::firmwareInfo(QByteArray firmware)
+void bootloadProcess::firmwareInfo(QByteArray firmware, QString version, uint32_t offsetAddress)
 {
     DataPacket pack;
     pack.nCMD = COM_CMD_DOWNLOAD_INFO;
-    pack.nLength = 12;
-    set32Byte((char *)pack.aData, firmware.length());
-    uint32_t crc = CRC32((uint8_t *)firmware.data(), firmware.length());
+    pack.nLength = 0;
+    set32Byte((char *)pack.aData, firmware.length());       //固件长度
+    pack.nLength += 4;
+    uint32_t crc = CRC32((uint8_t *)firmware.data(), firmware.length());    //CRC校验码
     set32Byte((char *)&pack.aData[4], crc);
+    pack.nLength += 4;
 
-    packetNumber = firmware.length() / DOWNLOAD_FILE_PACK_SIZE;
-    if (firmware.length() % DOWNLOAD_FILE_PACK_SIZE)
-    {
-        packetNumber += 1;
-    }
-    set32Byte((char *)&pack.aData[8], packetNumber);
-    //qDebug()<<("packetNumber = %d", packetNumber);
+    set32Byte((char *)&pack.aData[4], offsetAddress);   //偏移地址
+    pack.nLength += 4;
+
+    pack.aData[pack.nLength++] = (uint8_t)(version.length() & 0xff);    //版本号长度
+
+    memcpy(&pack.aData[pack.nLength], version.toLocal8Bit().data(), version.length() & 0xff);//版本号
+    pack.nLength += (uint8_t)(version.length() & 0xff);
+
     sendPackAndStartRetry(pack);
 }
 
@@ -277,8 +309,13 @@ void bootloadProcess::downloadFirmwarePack()
 {
     DataPacket pack;
     pack.nCMD = COM_CMD_DOWNLOAD_DATA;
-    pack.nLength = DOWNLOAD_FILE_PACK_SIZE + 4;
-    set32Byte((char *)pack.aData, currentPackNum);
+    pack.nLength = DOWNLOAD_FILE_PACK_SIZE + 8;
+
+
+    set32Byte((char *)pack.aData, packetNumber);
+
+
+    set32Byte((char *)&pack.aData[4], currentPackNum);
 
     uint8_t *dataBuf = (uint8_t *)firmware.data();
     uint32_t length = 0;
@@ -292,11 +329,11 @@ void bootloadProcess::downloadFirmwarePack()
         length = firmware.length() - currentPackNum * DOWNLOAD_FILE_PACK_SIZE;
     }
 
-    memcpy(&pack.aData[4], &dataBuf[currentPackNum * DOWNLOAD_FILE_PACK_SIZE], length);
+    memcpy(&pack.aData[8], &dataBuf[currentPackNum * DOWNLOAD_FILE_PACK_SIZE], length);
 
     downloadProgress += length;
     currentPackNum++;
-    //qDebug()<<("currentPackNum = %d", currentPackNum);
+    qDebug()<<("currentPackNum = %d", currentPackNum);
     emit updateFirmwareProgress(downloadProgress);
 
     sendPackAndStartRetry(pack);

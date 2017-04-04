@@ -59,9 +59,9 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         if (*(bool*)(arg))
         {
             text = "Device Connected!";
-            ui->eraseButton->setEnabled(true);
+            //ui->eraseButton->setEnabled(true);
             ui->updateButton->setEnabled(true);
-            ui->runButton->setEnabled(true);
+            //ui->runButton->setEnabled(true);
         }
         else
         {
@@ -104,14 +104,6 @@ void UpdateFirmware::on_filePathButton_clicked()
         return;
     }
     ui->pathEdit->setText(fileName);
-
-    QDataStream binFile(file);
-
-    char buff[file->size()];
-
-    binFile.readRawData(buff, (qint64)file->size());    //读取文件
-
-    QByteArray binArray(buff, file->size()); //转换为QByteArray
 }
 
 /******************************************
@@ -128,11 +120,46 @@ void UpdateFirmware::bootloadInfo(QString bootVsersion, QString firemwareVersion
     {
         ui->firmwareVersionLabel->setText(firemwareVersion);
         ui->runButton->setEnabled(true);
+        ui->eraseButton->setEnabled(true);
     }
     else
     {
         ui->firmwareVersionLabel->setText("Invalid");
         ui->runButton->setEnabled(false);
+        ui->eraseButton->setEnabled(false);
     }
 
+}
+/******************************************
+ * @函数说明：升级设备固件
+ * @输入参数：QByteArray binByteArray 固件
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void UpdateFirmware::on_updateButton_clicked()
+{
+    if (ui->pathEdit->text() == "")
+    {
+        QMessageBox::warning(this,"Error","Please select a file",QMessageBox::Ok);
+        return;
+    }
+
+    QFile *file = new QFile(ui->pathEdit->text());
+
+    if(!file->open(QIODevice::ReadOnly))    //文件存在可以打开
+    {
+        QMessageBox::warning(this,"Error","Cann't open file",QMessageBox::Ok);
+        return;
+    }
+
+    QDataStream binFile(file);
+
+    char buff[file->size()];
+
+    binFile.readRawData(buff, (qint64)file->size());    //读取文件
+
+    QByteArray binArray(buff, file->size()); //转换为QByteArray
+
+    bool ok;
+    boot->updateFirmware(binArray, ui->firmwareVersionLabel->text(),(uint32_t)ui->addressEdit->text().toInt(&ok, 0));
 }
