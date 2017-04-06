@@ -59,9 +59,8 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         if (*(bool*)(arg))
         {
             text = "Device Connected!";
-            //ui->eraseButton->setEnabled(true);
             ui->updateButton->setEnabled(true);
-            //ui->runButton->setEnabled(true);
+            boot->getInfo();
         }
         else
         {
@@ -69,10 +68,28 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         }
         break;
     case bootloadProcess::EARSE_RESULT:
+        if (*(bool*)(arg))
+        {
+            text = "Earse Sucess!";
+        }
+        else
+        {
+            text = "Earse Fail!";
+        }
         break;
     case bootloadProcess::WRITE_ERROR:
         break;
     case bootloadProcess::DLOWNLOAD_PROGRESS:
+        if (*(int*)arg < ui->progressBar->maximum())
+        {
+            text = "Download is in progress";
+        }
+        else
+        {
+            text = "Download sucess";
+            boot->getInfo();
+        }
+        ui->progressBar->setValue(*(int*)arg);
         break;
     default:
         break;
@@ -160,6 +177,14 @@ void UpdateFirmware::on_updateButton_clicked()
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
 
+    ui->progressBar->setEnabled(true);
+    ui->progressBar->setRange(0,binArray.length());
+
     bool ok;
-    boot->updateFirmware(binArray, ui->firmwareVersionLabel->text(),(uint32_t)ui->addressEdit->text().toInt(&ok, 0));
+    boot->updateFirmware(binArray, ui->versionEdit->text(),(uint32_t)ui->addressEdit->text().toInt(&ok, 0));
+}
+
+void UpdateFirmware::on_eraseButton_clicked()
+{
+    boot->erase(0);
 }

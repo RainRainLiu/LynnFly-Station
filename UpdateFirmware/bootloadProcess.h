@@ -18,6 +18,7 @@ public:
     bool updateFirmware(QByteArray binByteArray, QString version, uint32_t offsetAddr);   //更新固件
     void startHearbeat();
     void runFirmware();
+    void getInfo();
     void erase(uint32_t size);
     typedef enum
     {
@@ -48,11 +49,12 @@ private:
     void receivePacketProcess(DataPacket *packet);
     void firmwareInfo(QByteArray firmware, QString version, uint32_t offsetAddress);
     void downloadFirmwarePack();
-    void getInfo();
+
+    void stopRetry();
+    void retryTimeOut();
 
 signals:
     int writeData(QByteArray array);    //数据出口
-    void updateFirmwareProgress(uint32_t progress); //更新固件进度
     void bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void *arg);
     void bootloadInfo(QString bootloadVersion, QString firmwareVersion, bool firmwareState);
 
@@ -62,7 +64,7 @@ public slots:
 private slots:
 
     void sendHearbeat();
-    void retryTimeOut();
+
 
 };
 

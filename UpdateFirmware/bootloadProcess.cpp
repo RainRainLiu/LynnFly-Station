@@ -36,6 +36,7 @@ bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, u
     firmwareVersion = version;
     firmwareOffsetAddress = offsetAddr;
     downloadFlag = true;
+    downloadProgress = 0;
     packetNumber = firmware.length() / DOWNLOAD_FILE_PACK_SIZE;
     if (firmware.length() % DOWNLOAD_FILE_PACK_SIZE > 0)
     {
@@ -131,6 +132,19 @@ void bootloadProcess::retryTimeOut()
         }
     }
 }
+/******************************************
+ * @函数说明：发送数据包，并启动重发
+ * @输入参数：DataPacket packet 数据包
+ * @返回参数：无
+ * @修订日期：
+******************************************/
+void bootloadProcess::stopRetry()
+{
+    if (retryTimer->isActive() == true) //终止重试定时器
+    {
+        retryTimer->stop();
+    }
+}
 
 /******************************************
  * @函数说明：发送数据包，并启动重发
@@ -142,6 +156,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
 {
     //qDebug()<<"CMD";
     //qDebug()<<("%x", packet->nCMD);
+    stopRetry();
     switch(packet->nCMD)
     {
         case COM_CMD_HEARBEAT:
@@ -288,7 +303,7 @@ void bootloadProcess::firmwareInfo(QByteArray firmware, QString version, uint32_
     set32Byte((char *)&pack.aData[4], crc);
     pack.nLength += 4;
 
-    set32Byte((char *)&pack.aData[4], offsetAddress);   //偏移地址
+    set32Byte((char *)&pack.aData[8], offsetAddress);   //偏移地址
     pack.nLength += 4;
 
     pack.aData[pack.nLength++] = (uint8_t)(version.length() & 0xff);    //版本号长度
@@ -334,8 +349,8 @@ void bootloadProcess::downloadFirmwarePack()
     downloadProgress += length;
     currentPackNum++;
     qDebug()<<("currentPackNum = %d", currentPackNum);
-    emit updateFirmwareProgress(downloadProgress);
 
+    emit bootloadEvent(DLOWNLOAD_PROGRESS, &downloadProgress);
     sendPackAndStartRetry(pack);
 }
 

@@ -33,6 +33,7 @@ private slots:
     void bootloadInfo(QString bootVsersion, QString firemwareVersion, bool state);
 
     void on_updateButton_clicked();
+    void on_eraseButton_clicked();
 };
 
 #endif // UPDATEFIRMWARE_H
