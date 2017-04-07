@@ -163,6 +163,7 @@ void MainWindow::progDlogUpdate(uint32_t progress)
 void MainWindow::on_updateFirmwareButton_clicked()
 {
     updateWindow = new UpdateFirmware();
+    updateWindow->setAttribute(Qt::WA_DeleteOnClose, true); //关闭窗口自动释放资源
     connect(serialPort, SIGNAL(receiceData(QByteArray)), updateWindow, SLOT(readData(QByteArray)));
     connect(updateWindow,SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
     updateWindow->show();

@@ -5,7 +5,7 @@
 #include "QTimer"
 #include "Componemts/communicationFormat.h"
 
-
+#define HERARBEAT_TIME_OUT_TIME_SHORT 10
 #define HERARBEAT_TIME_OUT_TIME     500
 #define RETRY_TIME_OUT_TIME         500
 #define DOWNLOAD_FILE_PACK_SIZE     1024
@@ -19,7 +19,8 @@ public:
     void startHearbeat();
     void runFirmware();
     void getInfo();
-    void erase(uint32_t size);
+    void erase(uint32_t size, uint32_t offsetAddress);
+    void stopAllTime();
     typedef enum
     {
         WRITE_ERROR,
@@ -27,6 +28,8 @@ public:
         EARSE_RESULT,               //擦除结果          bool
         WRITE_INFO_RESULT,          //写入固件信息结果    bool
         DLOWNLOAD_PROGRESS,         //下载固件进度       u32
+        DLOWNLOAD_RESULT,           //下载结果
+        RUN_FIRMWARE_RESULT,        //运行固件
     }BOOTLOAD_EVENT_T;
 
 private:

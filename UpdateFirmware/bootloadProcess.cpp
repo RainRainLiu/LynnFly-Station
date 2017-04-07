@@ -36,16 +36,17 @@ bool bootloadProcess::updateFirmware(QByteArray binByteArray, QString version, u
     firmwareVersion = version;
     firmwareOffsetAddress = offsetAddr;
     downloadFlag = true;
-    downloadProgress = 0;
-    packetNumber = firmware.length() / DOWNLOAD_FILE_PACK_SIZE;
-    if (firmware.length() % DOWNLOAD_FILE_PACK_SIZE > 0)
-    {
-        packetNumber += 1;
-    }
-    currentPackNum = 0;
-    erase(firmware.length());
+
+    erase(firmware.length(), offsetAddr);
     return true;
 }
+
+void bootloadProcess::stopAllTime()
+{
+    retryTimer->stop();
+    hearbeatTimer->stop();
+}
+
 /******************************************
  * @函数说明：启动心跳
  * @输入参数：无
@@ -56,7 +57,15 @@ void bootloadProcess::startHearbeat()
 {
     if (hearbeatTimer->isActive() == false)
     {
-        hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME);
+        if (connected == true)
+        {
+            hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME);
+        }
+        else
+        {
+            hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME_SHORT);
+        }
+
     }
 }
 
@@ -68,7 +77,10 @@ void bootloadProcess::startHearbeat()
 ******************************************/
 void bootloadProcess::sendHearbeat()
 {
-    hearbeatTimer->stop();
+    if (connected == true)
+    {
+        hearbeatTimer->stop();
+    }
 
     DataPacket packet;
 
@@ -106,6 +118,7 @@ void bootloadProcess::sendPackAndStartRetry(DataPacket packet)
 ******************************************/
 void bootloadProcess::retryTimeOut()
 {
+    qDebug()<<"Retry Time Out";
     retryCount++;
     if (retryCount > 3)
     {
@@ -118,7 +131,7 @@ void bootloadProcess::retryTimeOut()
             connected = false;
             emit bootloadEvent(CONNECT_STATE, &connected); //设备断开连接
         }
-        hearbeatTimer->start();
+        startHearbeat();
     }
     else
     {
@@ -155,7 +168,7 @@ void bootloadProcess::stopRetry()
 void bootloadProcess::receivePacketProcess(DataPacket *packet)
 {
     //qDebug()<<"CMD";
-    //qDebug()<<("%x", packet->nCMD);
+    qDebug("CMD %x ", packet->nCMD);
     stopRetry();
     switch(packet->nCMD)
     {
@@ -219,6 +232,14 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
             {
                 ok = true;
                 qDebug()<<"DOWNLOAD_INFO Sucess";
+                downloadFlag = false;
+                downloadProgress = 0;
+                packetNumber = firmware.length() / DOWNLOAD_FILE_PACK_SIZE;
+                if (firmware.length() % DOWNLOAD_FILE_PACK_SIZE > 0)
+                {
+                    packetNumber += 1;
+                }
+                currentPackNum = 0;
                 downloadFirmwarePack();
             }
             else
@@ -231,14 +252,46 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
 
         case COM_CMD_DOWNLOAD_DATA:
         {
-            if (currentPackNum < packetNumber)
+            bool ok;
+            if (packet->aData[0] == 0)
             {
-                downloadFirmwarePack();
+                if (currentPackNum < packetNumber)
+                {
+                    downloadFirmwarePack();
+                    emit bootloadEvent(DLOWNLOAD_PROGRESS, &downloadProgress);
+                }
+                else        //下载完成
+                {
+                    ok = true;
+                    emit bootloadEvent(DLOWNLOAD_PROGRESS, &downloadProgress);
+                    emit bootloadEvent(DLOWNLOAD_RESULT, &ok);
+                }
+
+            }
+            else
+            {
+                ok = false;
+                emit bootloadEvent(DLOWNLOAD_RESULT, &ok);
             }
 
         }
         break;
 
+        case COM_CMD_RUN_FIRMWARE:
+        {
+            bool ok;
+            if (packet->aData[0] == 0)
+            {
+                ok = true;
+                emit bootloadEvent(RUN_FIRMWARE_RESULT, &ok);
+            }
+            else
+            {
+                ok = false;
+                emit bootloadEvent(RUN_FIRMWARE_RESULT, &ok);
+            }
+        }
+        break;
     }
     retryTimer->stop();
 }
@@ -277,12 +330,13 @@ void set32Byte(char *buf, uint32_t data)
  * @返回参数：无
  * @修订日期：
 ******************************************/
-void bootloadProcess::erase(uint32_t size)
+void bootloadProcess::erase(uint32_t size, uint32_t offsetAddress)
 {
     DataPacket pack;
     pack.nCMD = COM_CMD_ERASURE;
-    pack.nLength = 4;
+    pack.nLength = 8;
     set32Byte((char *)pack.aData, size);
+    set32Byte((char *)&pack.aData[4], offsetAddress);
     sendPackAndStartRetry(pack);
 }
 
@@ -350,8 +404,8 @@ void bootloadProcess::downloadFirmwarePack()
     currentPackNum++;
     qDebug()<<("currentPackNum = %d", currentPackNum);
 
-    emit bootloadEvent(DLOWNLOAD_PROGRESS, &downloadProgress);
     sendPackAndStartRetry(pack);
+
 }
 
 /******************************************

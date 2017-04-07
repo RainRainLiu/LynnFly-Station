@@ -19,7 +19,6 @@ UpdateFirmware::UpdateFirmware(QWidget *parent) :
 UpdateFirmware::~UpdateFirmware()
 {
     delete ui;
-
 }
 
 /******************************************
@@ -71,26 +70,48 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         if (*(bool*)(arg))
         {
             text = "Earse Sucess!";
+            boot->getInfo();
         }
         else
         {
             text = "Earse Fail!";
+            QMessageBox::warning(this,"Error","Earse Fail!",QMessageBox::Ok);
         }
         break;
     case bootloadProcess::WRITE_ERROR:
         break;
     case bootloadProcess::DLOWNLOAD_PROGRESS:
-        if (*(int*)arg < ui->progressBar->maximum())
+
+        text = "Download is in progress";
+
+        ui->progressBar->setValue(*(int*)arg);
+        break;
+    case bootloadProcess::DLOWNLOAD_RESULT:
+        if (*(bool*)(arg))
         {
-            text = "Download is in progress";
+            text = "Dolwnload Sucess!";
+            boot->getInfo();
         }
         else
         {
-            text = "Download sucess";
+            QMessageBox::warning(this,"Error","Download firmware fail!",QMessageBox::Ok);
+            text = "Dolwnload Fail!";
+        }
+        break;
+
+    case bootloadProcess::RUN_FIRMWARE_RESULT:
+        if (*(bool*)(arg))
+        {
+            text = "Run Sucess!";
             boot->getInfo();
         }
-        ui->progressBar->setValue(*(int*)arg);
+        else
+        {
+            QMessageBox::warning(this,"Error","Run firmware fail!",QMessageBox::Ok);
+            text = "Run Fail!";
+        }
         break;
+
     default:
         break;
     }
@@ -186,5 +207,16 @@ void UpdateFirmware::on_updateButton_clicked()
 
 void UpdateFirmware::on_eraseButton_clicked()
 {
-    boot->erase(0);
+    bool ok;
+    boot->erase(0, (uint32_t)ui->addressEdit->text().toInt(&ok, 0));
+}
+
+void UpdateFirmware::closeEvent(QCloseEvent *event)
+{
+    event = event;
+}
+
+void UpdateFirmware::on_runButton_clicked()
+{
+    boot->runFirmware();
 }

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "bootloadProcess.h"
+#include "QCloseEvent"
 namespace Ui {
 class UpdateFirmware;
 }
@@ -18,6 +19,7 @@ public:
 private:
     Ui::UpdateFirmware *ui;
     bootloadProcess *boot;
+    void closeEvent(QCloseEvent *event);
 
 public slots:
     void readData(QByteArray array);
@@ -34,6 +36,7 @@ private slots:
 
     void on_updateButton_clicked();
     void on_eraseButton_clicked();
+    void on_runButton_clicked();
 };
 
 #endif // UPDATEFIRMWARE_H

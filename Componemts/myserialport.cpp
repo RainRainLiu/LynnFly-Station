@@ -144,6 +144,7 @@ void mySerialPort::readData(void)
     buf = serialPort->readAll();
     if (buf.length() != 0)
     {
+        qDebug("Sserial port rx %d\r\n", buf.length());
         emit receiceData(buf);
     }
     buf.clear();
