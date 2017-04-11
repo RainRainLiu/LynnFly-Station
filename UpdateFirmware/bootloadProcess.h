@@ -6,8 +6,8 @@
 #include "Componemts/communicationFormat.h"
 
 #define HERARBEAT_TIME_OUT_TIME_SHORT 10
-#define HERARBEAT_TIME_OUT_TIME     500
-#define RETRY_TIME_OUT_TIME         500
+#define HERARBEAT_TIME_OUT_TIME     1000
+#define RETRY_TIME_OUT_TIME         200
 #define DOWNLOAD_FILE_PACK_SIZE     1024
 
 class bootloadProcess : public QObject
@@ -54,7 +54,7 @@ private:
     void downloadFirmwarePack();
 
     void stopRetry();
-    void retryTimeOut();
+
 
 signals:
     int writeData(QByteArray array);    //数据出口
@@ -65,7 +65,7 @@ public slots:
     void receiveProcess(QByteArray buf);    //接收数据
 
 private slots:
-
+    void retryTimeOut();
     void sendHearbeat();
 
 

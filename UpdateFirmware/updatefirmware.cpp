@@ -8,6 +8,7 @@ UpdateFirmware::UpdateFirmware(QWidget *parent) :
     ui(new Ui::UpdateFirmware)
 {
     ui->setupUi(this);
+    update = false;
     boot = new bootloadProcess();
     boot->startHearbeat();
     connect(boot, SIGNAL(writeData(QByteArray)),this, SLOT(bootloadWrite(QByteArray)));
@@ -64,13 +65,19 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         else
         {
             text = "Device Disconnected!";
+            ui->updateButton->setEnabled(false);
+            ui->runButton->setEnabled(false);
+            ui->eraseButton->setEnabled(false);
         }
         break;
     case bootloadProcess::EARSE_RESULT:
         if (*(bool*)(arg))
         {
             text = "Earse Sucess!";
-            boot->getInfo();
+            if (update == false)
+            {
+                boot->getInfo();
+            }
         }
         else
         {
@@ -87,6 +94,7 @@ void UpdateFirmware::bootloadEvent(bootloadProcess::BOOTLOAD_EVENT_T event, void
         ui->progressBar->setValue(*(int*)arg);
         break;
     case bootloadProcess::DLOWNLOAD_RESULT:
+        update = false;
         if (*(bool*)(arg))
         {
             text = "Dolwnload Sucess!";
@@ -200,7 +208,9 @@ void UpdateFirmware::on_updateButton_clicked()
 
     ui->progressBar->setEnabled(true);
     ui->progressBar->setRange(0,binArray.length());
+    ui->progressBar->setValue(0);
 
+    update = true;
     bool ok;
     boot->updateFirmware(binArray, ui->versionEdit->text(),(uint32_t)ui->addressEdit->text().toInt(&ok, 0));
 }

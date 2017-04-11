@@ -19,6 +19,7 @@ public:
 private:
     Ui::UpdateFirmware *ui;
     bootloadProcess *boot;
+    bool update;
     void closeEvent(QCloseEvent *event);
 
 public slots:

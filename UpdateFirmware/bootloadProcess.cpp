@@ -55,17 +55,13 @@ void bootloadProcess::stopAllTime()
 ******************************************/
 void bootloadProcess::startHearbeat()
 {
-    if (hearbeatTimer->isActive() == false)
+    if (connected == true)
     {
-        if (connected == true)
-        {
-            hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME);
-        }
-        else
-        {
-            hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME_SHORT);
-        }
-
+        hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME);
+    }
+    else
+    {
+        hearbeatTimer->start(HERARBEAT_TIME_OUT_TIME_SHORT);
     }
 }
 
@@ -77,10 +73,7 @@ void bootloadProcess::startHearbeat()
 ******************************************/
 void bootloadProcess::sendHearbeat()
 {
-    if (connected == true)
-    {
-        hearbeatTimer->stop();
-    }
+
 
     DataPacket packet;
 
@@ -102,6 +95,7 @@ void bootloadProcess::sendPackAndStartRetry(DataPacket packet)
 
     if ((emit writeData(comFormat->BuildPack(&packet))) > 0)
     {
+        stopRetry();
         retryTimer->start(RETRY_TIME_OUT_TIME); //启动重发定时器
     }
     else
@@ -179,8 +173,9 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
                 connected = true;
                 getInfo();
                 emit bootloadEvent(CONNECT_STATE, &connected); //设备连接
+                startHearbeat();
             }
-            startHearbeat();
+
         }
         break;
 
