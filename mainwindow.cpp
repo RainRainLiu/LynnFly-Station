@@ -58,7 +58,7 @@ void MainWindow::OpenCom(QAction * action)
     if (serialPort->openPortForDef(action->text()) == false)
     {
         ui->updateFirmwareButton->setEnabled(false);
-
+        ui->viewButton->setEnabled(false);
 
         QMessageBox message(QMessageBox::Information, "Serial Port Error", "Unable to open port!", QMessageBox::Yes, NULL);
         message.setIconPixmap(QPixmap(":/ico/ico/close.png"));
@@ -67,19 +67,10 @@ void MainWindow::OpenCom(QAction * action)
     else
     {
         ui->updateFirmwareButton->setEnabled(true);
+        ui->viewButton->setEnabled(true);
     }
 }
 
-/******************************************
- * @函数说明：更新固件的动作的槽
- * @输入参数：
- * @返回参数：无
- * @修订日期：
-******************************************/
-void MainWindow::runFirmware(bool b)
-{
-    b = b;
-}
 
 /******************************************
  * @函数说明：更新固件的动作的槽
@@ -113,50 +104,7 @@ void MainWindow::updateFirmware(bool b)
     binFile.readRawData(buff, (qint64)file->size());    //读取文件
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
-/*
-    if (bootload->updateFirmware(binArray) == true)
-    {
-        progDlg = new QProgressDialog();
-        progDlg->setWindowTitle("Downlaod Firmware...");
-        progDlg->setFixedWidth(500);
-        progDlg->setRange(0, file->size());
-        progDlg->show();
-        progDlg->setAutoClose(true);
-        progDlg->setAutoReset(false);
-        progDlg->setLabelText("Downlaod Firmware");
-
-        connect(progDlg, SIGNAL(canceled()), this, SLOT(progDlogCandeled));
-        connect(bootload,SIGNAL(updateFirmwareProgress(uint32_t)),
-                this, SLOT(progDlogUpdate(uint32_t)));
-    }
-    */
 }
-/******************************************
- * @函数说明：更新固件的动作的槽
- * @输入参数：
- * @返回参数：无
- * @修订日期：
-******************************************/
-void MainWindow::progDlogUpdate(uint32_t progress)
-{/*
-    progDlg->setValue(progress);
-    progDlg->show();
-
-    if (progDlg->value() >= progDlg->maximum())
-    {
-        progDlg->cancel();
-        QMessageBox message(QMessageBox::Information, "Update Firmware Sucess", "Do you want to run firmware?", QMessageBox::Yes | QMessageBox::No, NULL);
-        message.setIconPixmap(QPixmap(":/ico/ico/jump.png"));
-        if(message.exec() == QMessageBox::Yes)
-        {
-            bootload->runFirmware();
-        }
-    }*/
-}
-
-
-
-
 
 
 
@@ -179,4 +127,13 @@ void MainWindow::on_serialPortComboBox_activated(const QString &arg1)
         message.setIconPixmap(QPixmap(":/ico/ico/close.png"));
         message.exec();
     }
+}
+
+void MainWindow::on_viewButton_clicked()
+{
+    lineChartWindow = new LineChart();
+    lineChartWindow->setAttribute(Qt::WA_DeleteOnClose, true); //关闭窗口自动释放资源
+    //connect(serialPort, SIGNAL(receiceData(QByteArray)), flyWindow, SLOT(readData(QByteArray)));
+    //connect(updateWindow,SIGNAL(writeData(QByteArray)), serialPort, SLOT(writeData(QByteArray)));
+    lineChartWindow->show();
 }

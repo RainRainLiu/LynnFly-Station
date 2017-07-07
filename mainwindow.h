@@ -6,6 +6,7 @@
 #include "QProgressDialog"
 #include "Componemts/myserialport.h"
 #include "UpdateFirmware/updatefirmware.h"
+#include "LineChart/linechart.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,18 +23,21 @@ public:
 private slots:
     void OpenCom(QAction * action);
     void updateFirmware(bool b);
-    void progDlogUpdate(uint32_t progress);
+    //void progDlogUpdate(uint32_t progress);
 
-    void runFirmware(bool b);
+    //void runFirmware(bool b);
 
     void on_updateFirmwareButton_clicked();
 
     void on_serialPortComboBox_activated(const QString &arg1);
 
+    void on_viewButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     UpdateFirmware *updateWindow;
+    LineChart *lineChartWindow;
     void CreatMenu();
     QLabel *statueLable;
     mySerialPort *serialPort;

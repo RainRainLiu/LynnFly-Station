@@ -20,17 +20,20 @@ SOURCES += main.cpp\
     Componemts/crc32.cpp \
     UpdateFirmware/updatefirmware.cpp \
     Componemts/communicationFormat.cpp \
-    UpdateFirmware/bootloadProcess.cpp
+    UpdateFirmware/bootloadProcess.cpp \
+    LineChart/linechart.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
     Componemts/crc32.h \
     UpdateFirmware/updatefirmware.h \
     Componemts/communicationFormat.h \
-    UpdateFirmware/bootloadProcess.h
+    UpdateFirmware/bootloadProcess.h \
+    LineChart/linechart.h
 
 FORMS    += mainwindow.ui \
-    UpdateFirmware/updatefirmware.ui
+    UpdateFirmware/updatefirmware.ui \
+    LineChart/linechart.ui
 
 RESOURCES += \
     ico.qrc

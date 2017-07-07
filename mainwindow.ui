@@ -64,7 +64,7 @@
    </widget>
    <widget class="QPushButton" name="viewButton">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -87,7 +87,7 @@
      <string notr="true"/>
     </property>
     <property name="text">
-     <string>View</string>
+     <string>LineChart</string>
     </property>
     <property name="iconSize">
      <size>
