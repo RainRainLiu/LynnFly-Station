@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include "QtSerialPort/QSerialPortInfo"
@@ -99,11 +99,13 @@ void MainWindow::updateFirmware(bool b)
 
     QDataStream binFile(file);
 
-    char buff[file->size()];
+    //char buff[file->size()];
+    char *buff = (char *)malloc(file->size());
 
     binFile.readRawData(buff, (qint64)file->size());    //读取文件
 
     QByteArray binArray(buff, file->size()); //转换为QByteArray
+    free(buff);
 }
 
 

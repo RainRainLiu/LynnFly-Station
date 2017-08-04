@@ -1,4 +1,4 @@
-#include "updatefirmware.h"
+﻿#include "updatefirmware.h"
 #include "ui_updatefirmware.h"
 #include "QFileDialog"
 #include <QMessageBox>
@@ -200,7 +200,8 @@ void UpdateFirmware::on_updateButton_clicked()
 
     QDataStream binFile(file);
 
-    char buff[file->size()];
+    //char buff[file->size()];
+    char *buff = (char *)malloc(file->size());
 
     binFile.readRawData(buff, (qint64)file->size());    //读取文件
 
@@ -213,6 +214,8 @@ void UpdateFirmware::on_updateButton_clicked()
     update = true;
     bool ok;
     boot->updateFirmware(binArray, ui->versionEdit->text(),(uint32_t)ui->addressEdit->text().toInt(&ok, 0));
+
+    free(buff);
 }
 
 void UpdateFirmware::on_eraseButton_clicked()

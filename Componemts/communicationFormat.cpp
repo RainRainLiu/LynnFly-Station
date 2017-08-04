@@ -1,4 +1,4 @@
-#include "communicationFormat.h"
+﻿#include "communicationFormat.h"
 
 const uint8_t   STX = 0xeb;
 const uint8_t   ETX = 0x30;
@@ -26,7 +26,8 @@ static uint8_t CalculateCheckSum(DataPacket *pPack)
 {
     uint8_t checkSum = STX;
 
-    checkSum += pPack->nCMD;
+    checkSum += pPack->nCMD1;
+    checkSum += pPack->nCMD2;
     checkSum += (uint8_t)(pPack->nLength & 0xff);
     checkSum += (uint8_t)((pPack->nLength >> 8) & 0xff);
 
@@ -114,13 +115,20 @@ DataPacket* communicationFormat::Parsing(uint8_t inData)
 
         case 1:
         {
-            packet.nCMD = data;
+            packet.nCMD1 = data;
+            step++;
+            count = 0;
+        }
+        break;
+        case 2:
+        {
+            packet.nCMD2 = data;
             step++;
             count = 0;
         }
         break;
 
-        case 2:
+        case 3:
         {
             if (count == 0)
             {
@@ -140,7 +148,7 @@ DataPacket* communicationFormat::Parsing(uint8_t inData)
         }
         break;
 
-        case 3:
+        case 4:
         {
             packet.aData[count] = data;
 
@@ -152,7 +160,7 @@ DataPacket* communicationFormat::Parsing(uint8_t inData)
         }
         break;
 
-        case 4:
+        case 5:
         {
             if (CalculateCheckSum(&packet) == data)
             {
@@ -165,7 +173,7 @@ DataPacket* communicationFormat::Parsing(uint8_t inData)
         }
         break;
 
-        case 5:
+        case 6:
         {
             if (data == ETX)
             {
@@ -198,7 +206,8 @@ QByteArray communicationFormat::BuildPack(DataPacket *pPack)
 
 
     escBuf[length++] = STX;
-    length += DisposeESC(1, &escBuf[length], &pPack->nCMD);
+    length += DisposeESC(1, &escBuf[length], &pPack->nCMD1);
+    length += DisposeESC(1, &escBuf[length], &pPack->nCMD2);
     length += DisposeESC(2, &escBuf[length], (uint8_t *)&pPack->nLength);
     length += DisposeESC(pPack->nLength, &escBuf[length], (uint8_t *)&pPack->aData);
 
@@ -210,3 +219,25 @@ QByteArray communicationFormat::BuildPack(DataPacket *pPack)
 
     return array;
 }
+
+void communicationFormat::PackProcess(DataPacket *packet)
+{
+    packet = packet;
+}
+
+
+
+void communicationFormat::InData(QByteArray byteData)
+{
+    DataPacket *packet = NULL;
+    for (int i = 0; i < byteData.length(); i++)
+    {
+        packet =  Parsing((uint8_t)byteData[i]);
+        if (packet != NULL)
+        {
+            PackProcess(packet);
+        }
+    }
+}
+
+

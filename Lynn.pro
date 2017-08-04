@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     UpdateFirmware/updatefirmware.cpp \
     Componemts/communicationFormat.cpp \
     UpdateFirmware/bootloadProcess.cpp \
-    LineChart/linechart.cpp
+    LineChart/linechart.cpp \
+    LineChart/gesture.cpp \
+    Componemts/myfunction.cpp
 
 HEADERS  += mainwindow.h \
     Componemts/myserialport.h \
@@ -29,7 +31,9 @@ HEADERS  += mainwindow.h \
     UpdateFirmware/updatefirmware.h \
     Componemts/communicationFormat.h \
     UpdateFirmware/bootloadProcess.h \
-    LineChart/linechart.h
+    LineChart/linechart.h \
+    LineChart/gesture.h \
+    Componemts/myfunction.h
 
 FORMS    += mainwindow.ui \
     UpdateFirmware/updatefirmware.ui \

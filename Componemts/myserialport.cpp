@@ -1,4 +1,4 @@
-#include "myserialport.h"
+﻿#include "myserialport.h"
 #include "QtSerialPort/qserialport.h"
 #include "QtSerialPort/qserialportinfo.h"
 #include "QDebug"

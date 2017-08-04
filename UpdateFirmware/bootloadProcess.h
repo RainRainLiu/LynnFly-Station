@@ -1,5 +1,6 @@
-#ifndef BOOTLOAD_H
+﻿#ifndef BOOTLOAD_H
 #define BOOTLOAD_H
+
 
 #include <QObject>
 #include "QTimer"

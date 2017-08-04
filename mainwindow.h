@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -23,9 +23,7 @@ public:
 private slots:
     void OpenCom(QAction * action);
     void updateFirmware(bool b);
-    //void progDlogUpdate(uint32_t progress);
 
-    //void runFirmware(bool b);
 
     void on_updateFirmwareButton_clicked();
 

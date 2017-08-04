@@ -1,14 +1,6 @@
-#include "bootloadProcess.h"
+﻿#include "bootloadProcess.h"
 #include "Componemts/crc32.h"
 #include "QDebug"
-
-#define COM_CMD_HEARBEAT        0X01
-#define COM_CMD_INFO            0X02
-#define COM_CMD_ERASURE         0X03
-#define COM_CMD_ERASURE_REPORT  0X04
-#define COM_CMD_DOWNLOAD_INFO   0X05
-#define COM_CMD_DOWNLOAD_DATA   0X06
-#define COM_CMD_RUN_FIRMWARE    0X07
 
 
 
@@ -76,8 +68,8 @@ void bootloadProcess::sendHearbeat()
 
 
     DataPacket packet;
-
-    packet.nCMD = COM_CMD_HEARBEAT;
+    packet.nCMD1 = COM_CMD1_BOOT;
+    packet.nCMD2 = COM_CMD2_BOOT_HEARBEAT;
     packet.nLength = 0;
 
     sendPackAndStartRetry(packet);
@@ -162,11 +154,15 @@ void bootloadProcess::stopRetry()
 void bootloadProcess::receivePacketProcess(DataPacket *packet)
 {
     //qDebug()<<"CMD";
-    qDebug("CMD %x ", packet->nCMD);
-    stopRetry();
-    switch(packet->nCMD)
+    if (packet->nCMD1 != COM_CMD1_BOOT)
     {
-        case COM_CMD_HEARBEAT:
+        return;
+    }
+    qDebug("CMD %x ", packet->nCMD2);
+    stopRetry();
+    switch(packet->nCMD2)
+    {
+        case COM_CMD2_BOOT_HEARBEAT:
         {
             if (connected == false)
             {
@@ -179,7 +175,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CMD_INFO:
+        case COM_CMD2_BOOT_INFO:
         {
             QString bootloadVersion = QString::fromLocal8Bit((const char *)&packet->aData[1], (int)packet->aData[0]);
             QString firmwareVersion = QString::fromLocal8Bit((const char *)&packet->aData[packet->aData[0] + 2], (int)packet->aData[packet->aData[0] + 1]);
@@ -194,13 +190,13 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CMD_ERASURE:
+        case COM_CMD2_BOOT_ERASURE:
         {
             qDebug()<<"Earsure ACK";
         }
         break;
 
-        case COM_CMD_ERASURE_REPORT:
+        case COM_CMD2_BOOT_ERASURE_REPORT:
         {
             qDebug()<<"Earsure Sucess";
             bool ok;
@@ -220,7 +216,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CMD_DOWNLOAD_INFO:
+        case COM_CMD2_BOOT_DOWNLOAD_INFO:
         {
             bool ok;
             if (packet->aData[0] == 0)
@@ -245,7 +241,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CMD_DOWNLOAD_DATA:
+        case COM_CMD2_BOOT_DOWNLOAD_DATA:
         {
             bool ok;
             if (packet->aData[0] == 0)
@@ -272,7 +268,7 @@ void bootloadProcess::receivePacketProcess(DataPacket *packet)
         }
         break;
 
-        case COM_CMD_RUN_FIRMWARE:
+        case COM_CMD2_BOOT_RUN_FIRMWARE:
         {
             bool ok;
             if (packet->aData[0] == 0)
@@ -328,7 +324,8 @@ void set32Byte(char *buf, uint32_t data)
 void bootloadProcess::erase(uint32_t size, uint32_t offsetAddress)
 {
     DataPacket pack;
-    pack.nCMD = COM_CMD_ERASURE;
+    pack.nCMD1 = COM_CMD1_BOOT;
+    pack.nCMD2 = COM_CMD2_BOOT_ERASURE;
     pack.nLength = 8;
     set32Byte((char *)pack.aData, size);
     set32Byte((char *)&pack.aData[4], offsetAddress);
@@ -344,7 +341,8 @@ void bootloadProcess::erase(uint32_t size, uint32_t offsetAddress)
 void bootloadProcess::firmwareInfo(QByteArray firmware, QString version, uint32_t offsetAddress)
 {
     DataPacket pack;
-    pack.nCMD = COM_CMD_DOWNLOAD_INFO;
+    pack.nCMD1 = COM_CMD1_BOOT;
+    pack.nCMD2 = COM_CMD2_BOOT_DOWNLOAD_INFO;
     pack.nLength = 0;
     set32Byte((char *)pack.aData, firmware.length());       //固件长度
     pack.nLength += 4;
@@ -372,7 +370,8 @@ void bootloadProcess::firmwareInfo(QByteArray firmware, QString version, uint32_
 void bootloadProcess::downloadFirmwarePack()
 {
     DataPacket pack;
-    pack.nCMD = COM_CMD_DOWNLOAD_DATA;
+    pack.nCMD1 = COM_CMD1_BOOT;
+    pack.nCMD2 = COM_CMD2_BOOT_DOWNLOAD_DATA;
     pack.nLength = DOWNLOAD_FILE_PACK_SIZE + 8;
 
 
@@ -397,7 +396,6 @@ void bootloadProcess::downloadFirmwarePack()
 
     downloadProgress += length;
     currentPackNum++;
-    qDebug()<<("currentPackNum = %d", currentPackNum);
 
     sendPackAndStartRetry(pack);
 
@@ -412,7 +410,8 @@ void bootloadProcess::downloadFirmwarePack()
 void bootloadProcess::runFirmware()
 {
     DataPacket pack;
-    pack.nCMD = COM_CMD_RUN_FIRMWARE;
+    pack.nCMD1 = COM_CMD1_BOOT;
+    pack.nCMD2 = COM_CMD2_BOOT_RUN_FIRMWARE;
     pack.nLength = 0;
     sendPackAndStartRetry(pack);
 }
@@ -425,7 +424,8 @@ void bootloadProcess::runFirmware()
 void bootloadProcess::getInfo()
 {
     DataPacket pack;
-    pack.nCMD = COM_CMD_INFO;
+    pack.nCMD1 = COM_CMD1_BOOT;
+    pack.nCMD2 = COM_CMD2_BOOT_INFO;
     pack.nLength = 0;
     sendPackAndStartRetry(pack);
 }
